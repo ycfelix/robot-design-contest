@@ -19,6 +19,9 @@ Task List(Not in order):
 
 * Code enhancement
   * reduce complexity
+  
+* Flow chart
+  * draw a flow chart to show the sequence of robot movement
 
 
 Map used in the competition
