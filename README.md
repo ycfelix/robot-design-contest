@@ -32,8 +32,8 @@ Task List(Not in order):
     * Write library to do I/O to the sensor
    
    * Line tracking
-     * Tune the sensitivity 
-     * Write library to do I/O to the sensor  
+     * Tune the sensitivity (3/11/2018 update: 3~5cm for best sensitivity)
+     * Write library to do I/O to the sensor  (3/11/2018 update: Done and tested)
     
 
 
