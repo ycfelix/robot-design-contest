@@ -354,7 +354,7 @@ typedef struct
 #define SCB_DFSR_BKPT_Msk                  (1ul << SCB_DFSR_BKPT_Pos)                     /*!< SCB DFSR: BKPT Mask */
 
 #define SCB_DFSR_HALTED_Pos                 0                                             /*!< SCB DFSR: HALTED Position */
-#define SCB_DFSR_HALTED_Msk                (1ul << SCB_DFSR_HALTED_Pos)                   /*!< SCB DFSR: HALTED Mask */
+#define SCB_DFSR_HALTED_Msk                 (1ul << SCB_DFSR_HALTED_Pos)                   /*!< SCB DFSR: HALTED Mask */
 /*@}*/ /* end of group CMSIS_CM3_SCB */
 
 

@@ -3,7 +3,9 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/stm32f10x_std/inc/**"
+                "${workspaceFolder}/stm32f10x_std/inc/**",
+                "${workspaceFolder}/library/**",
+                "${workspaceFolder}/stm32f10x_startup/**"
             ],
             "defines": [
                 "_DEBUG",
