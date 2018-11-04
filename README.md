@@ -7,6 +7,7 @@ Thrower robots software design and implementation
 Please complete the following algorithm
 
 * Prerequisite: 2D-array, Looping
+* Download the folder `Camera`, there is a file `main.c` which may help you to do some testings
 
 * A `2D-array` is like 2d-coordinate system, for example,<br>
 in a coordinate system, (0,1) means the point x=0, y=1,<br>
@@ -34,11 +35,13 @@ SampleArray[0][2], which means 1st Row, 3rd element, and this element is `1`<br>
 eg: you can do sth like, `int Element=SampleArray[0][2];` and Element is equal to 1 now<br>
 `SampleArray[0][2]=3;`and SampleArray[0][2] is 3 now, but Element is kept equal to 1<br>
 
-* Note: For now, we will handle 1 or 0 horizontal line and 1 or 0 vertical line only, but we will probably<br>
-need to handle 0-2 vertical lines and 0-2 horizontal lines in the competition
+**Note: For now, we will handle 1 or 0 horizontal line and 1 or 0 vertical line only, but we will probably<br>
+need to handle 0-2 vertical lines and 0-2 horizontal lines in the competition**
 
 --------------------------
-* 1 `void StraightenLine(int Image[][], int Row, int Col);`
+--------------------------
+
+**Task 1 `void StraightenLine(int Image[][], int Row, int Col);`**
  * This Function should correct the content of the Image array<br>
  Input parameter:`Image[][]` is the Image 2d-array consists of 0 and 1 only<br>
  Input parameter:`Row` is the total number of rows in the array<br>
@@ -66,9 +69,9 @@ Sample Output: After the function, the array should be:<br>
 {0,0,1,0,0,0}<br>
 }
 
-* Note that the Col and Row is not fixed, the sample is simply for reference, the array may have diagonal lines<br>
+**Note that the Col and Row is not fixed, the sample is simply for reference, the array may have diagonal lines**
 --------------------------
- * 2 `void CalculateSlope(int Image[][], int Row, int Col);`
+**Task 2 `void CalculateSlope(int Image[][], int Row, int Col);`**
  Given an array of strightened 1 and 0, Calculate the slope of the lines and print it on the console<br>
 Sample:<br>
 {<br>
@@ -82,7 +85,7 @@ Sample:<br>
 Output: 1 , 0
 
 --------------------------
- * 3 `int CalculateAngle(int Image[][], int Row, int Col);`
+**Task 3 `int CalculateAngle(int Image[][], int Row, int Col);`**
  Given an array of strightened 1 and 0, Calculate the Angle of rotation, <br>
 Sample:<br>
 {<br>
