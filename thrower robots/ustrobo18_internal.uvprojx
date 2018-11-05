@@ -138,7 +138,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"flash.bat" (./Objects/ustrobo18_internal.hex COM6 115200 STM32F1_Med-density_128K)</Flash3>
+          <Flash3>"flash.bat" (./Objects/ustrobo18_internal.hex 1 115200 STM32F1_Med-density_128K)</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp>user</pFcarmGrp>
@@ -634,11 +634,6 @@
               <FilePath>.\src\library\rcc.c</FilePath>
             </File>
             <File>
-              <FileName>math.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\library\math.c</FilePath>
-            </File>
-            <File>
               <FileName>oled.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\library\oled.c</FilePath>
@@ -647,6 +642,11 @@
               <FileName>lineTracker.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\library\lineTracker.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ultrasonic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\library\Ultrasonic.c</FilePath>
             </File>
           </Files>
         </Group>

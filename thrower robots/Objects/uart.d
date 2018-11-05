@@ -3,11 +3,8 @@
 .\objects\uart.o: src\library\gpio.h
 .\objects\uart.o: .\src\stm32f10x_std\inc\stm32f10x_gpio.h
 .\objects\uart.o: .\src\stm32f10x_std\inc\stm32f10x.h
-.\objects\uart.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include\core_cm3.h
+.\objects\uart.o: .\src\stm32f10x_std\inc\core_cm3.h
 .\objects\uart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-.\objects\uart.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include\cmsis_version.h
-.\objects\uart.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include\cmsis_compiler.h
-.\objects\uart.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include\cmsis_armcc.h
 .\objects\uart.o: .\src\stm32f10x_std\inc\system_stm32f10x.h
 .\objects\uart.o: .\src\stm32f10x_std\inc\stm32f10x_conf.h
 .\objects\uart.o: .\src\stm32f10x_std\inc\stm32f10x_dma.h

@@ -1,43 +1,58 @@
-/*	
- *	UST Robotics Team Internal 2018
- *
- *  Author  : Anshuman Medhi
- *  Contact : amedhi@connect.ust.hk 
- *						68925193
- *
- */
-
 #include "main.h"
-
-// Include Library Headers Here
 #include "rcc.h"
 #include "ticks.h"
 #include "gpio.h"
-#include "leds.h"
-#include "buttons.h"
-#include "buzzer.h"
 #include "uart.h"
 #include "lcd_main.h"
-#include "oled.h"
-#include "camera.h"
-#include "pwm.h"
+#include "leds.h"
+#include "buttons.h"
 #include "adc.h"
+#include "camera.h"
+#include "lineTracker.h"
+#include "UltraSonic.h"
 
-int main() {
-	// Initialize Everything Here
-	rcc_init();
-	ticks_init();
-	
-	while (1) {
-		static u32 this_ticks = 0;
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
+int led_state=0;
 
-		static u32 last_led_ticks=0;
-		if ((this_ticks - last_led_ticks) >= 25) {
-			last_led_ticks = this_ticks;
-			//Code in here will run every 25ms
-			
-		}
-	}
+
+
+int main() 
+{
+    // Initialize Everything Here
+    rcc_init();
+    ticks_init();  
+		leds_init();
+		buttons_init();
+		adc_channel_init(ADC_IO_1);
+		adc_init();
+    //call uart_rx_init 
+		lineTracker_init();
+		tft_init(PIN_ON_RIGHT,GREY,RED,WHITE,BLUE);
+		tft_clear();
+	  camera_init(RGBColour);
+    //uart_rx_init(COM1,&UARTOnReceiveHandler);
+		sonar_init();
+		
+		
+    int lastticks=get_ticks();
+		int temp=lastticks;
+    while(1)
+		{
+						while( lastticks==get_ticks()){}
+            lastticks=get_ticks();
+							
+							
+						if(lastticks-temp%500==0)
+						{
+							sonar_start();
+						}
+						
+						tft_prints(0,0,"sonar position %d\n LineTracker state %d",sonar_get(),ReadLineTracker(lineTracker1));
+						tft_update();
+        		
+				
+				if(ReadLineTracker(lineTracker1)==1){led_on(LED1);}
+				else{led_off(LED1);}
+				
+				
+    }        
 }

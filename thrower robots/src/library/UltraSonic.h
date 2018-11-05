@@ -7,11 +7,6 @@
 #include "stdio.h"
 #include "misc.h"
 
-volatile uint8_t FLAG_ECHO = 0;
-volatile uint16_t SonarValue;
-
-void SetSysClockTo72(void);
-
 //init ultra sonic
 void sonar_init();
 
