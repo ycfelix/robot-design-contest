@@ -1,5 +1,6 @@
 #include "sys.h"
 #include "stm32f10x_tim.h"
+#include "stm32f10x_gpio.h"
 #include "ticks.h"
 #include "delay.h"
 #define uint unsigned int

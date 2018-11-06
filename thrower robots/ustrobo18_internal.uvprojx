@@ -644,11 +644,6 @@
               <FilePath>.\src\library\lineTracker.c</FilePath>
             </File>
             <File>
-              <FileName>UltraSonic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\library\UltraSonic.c</FilePath>
-            </File>
-            <File>
               <FileName>Sonar.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\library\Sonar.c</FilePath>
