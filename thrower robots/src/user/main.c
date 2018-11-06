@@ -19,7 +19,8 @@ int main()
 {
     // Initialize Everything Here
     rcc_init();
-   ticks_init();  
+	gpio_rcc_init(GPIOA);
+    ticks_init();  
 		leds_init();
 		buttons_init();
 		adc_channel_init(ADC_IO_1);
@@ -28,14 +29,15 @@ int main()
 		lineTracker_init();
 		tft_init(PIN_ON_RIGHT,GREY,RED,WHITE,BLUE);
 		tft_clear();
-	  camera_init(RGBColour);
+	  //camera_init(RGBColour);
     //uart_rx_init(COM1,&UARTOnReceiveHandler);
-		NVIC_Config();
+		//NVIC_Config();
 		CH_SR04_Init();
 		
 		
     int lastticks=get_ticks();
 		int temp=lastticks;
+		int distance=0;
     while(1)
 		{
 						while( lastticks==get_ticks()){}
@@ -44,15 +46,14 @@ int main()
 							
 						if(lastticks-temp==500)
 						{
-							int distance=Senor_Using();
-							tft_prints(0,0,"sonar position %f\n LineTracker state %d",distance,ReadLineTracker(lineTracker1));
-							tft_update();
+							distance=Senor_Using();
 							temp=lastticks;
 						}
-						delay(2000);
+						//delay(2000);
 						if(lastticks-temp>500)
 						{temp=lastticks;}
-						
+						tft_prints(0,0,"sonar position %d\n LineTracker state %d",distance,ReadLineTracker(lineTracker1));
+							tft_update();
 					
 				
 					
@@ -63,6 +64,9 @@ int main()
 						////tft_prints(0,0,"sonar position %d\n LineTracker state %d",sonar_get(),ReadLineTracker(lineTracker1));
 						//tft_update();
         		
+				
+				if(distance>0){led_on(LED2);}
+				else{led_off(LED2);}
 				
 				if(ReadLineTracker(lineTracker1)==1){led_on(LED1);}
 				else{led_off(LED1);}

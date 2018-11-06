@@ -29,3 +29,4 @@
 .\objects\main.o: .\src\library\Sonar.h
 .\objects\main.o: .\src\library\sys.h
 .\objects\main.o: .\src\stm32f10x_std\inc\stm32f10x_tim.h
+.\objects\main.o: .\src\library\delay.h

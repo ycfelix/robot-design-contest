@@ -18,3 +18,4 @@
 .\objects\sonar.o: .\src\stm32f10x_std\inc\misc.h
 .\objects\sonar.o: .\src\stm32f10x_std\inc\stm32f10x_tim.h
 .\objects\sonar.o: src\library\ticks.h
+.\objects\sonar.o: src\library\delay.h
