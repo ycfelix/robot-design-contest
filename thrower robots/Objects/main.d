@@ -26,6 +26,6 @@
 .\objects\main.o: .\src\library\adc.h
 .\objects\main.o: .\src\library\camera.h
 .\objects\main.o: .\src\library\lineTracker.h
-.\objects\main.o: .\src\library\UltraSonic.h
+.\objects\main.o: .\src\library\Sonar.h
+.\objects\main.o: .\src\library\sys.h
 .\objects\main.o: .\src\stm32f10x_std\inc\stm32f10x_tim.h
-.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

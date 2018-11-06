@@ -1,4 +1,4 @@
-.\objects\ultrasonic.o: src\library\Ultrasonic.c
+.\objects\ultrasonic.o: src\library\UltraSonic.c
 .\objects\ultrasonic.o: src\library\UltraSonic.h
 .\objects\ultrasonic.o: .\src\stm32f10x_std\inc\stm32f10x.h
 .\objects\ultrasonic.o: .\src\stm32f10x_std\inc\core_cm3.h

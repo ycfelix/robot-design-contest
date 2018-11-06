@@ -9,17 +9,17 @@
 #include "adc.h"
 #include "camera.h"
 #include "lineTracker.h"
-#include "UltraSonic.h"
+#include "Sonar.h"
 
 int led_state=0;
 
-
+ 
 
 int main() 
 {
     // Initialize Everything Here
     rcc_init();
-    ticks_init();  
+   ticks_init();  
 		leds_init();
 		buttons_init();
 		adc_channel_init(ADC_IO_1);
@@ -30,7 +30,8 @@ int main()
 		tft_clear();
 	  camera_init(RGBColour);
     //uart_rx_init(COM1,&UARTOnReceiveHandler);
-		sonar_init();
+		NVIC_Config();
+		CH_SR04_Init();
 		
 		
     int lastticks=get_ticks();
@@ -41,13 +42,26 @@ int main()
             lastticks=get_ticks();
 							
 							
-						if(lastticks-temp%500==0)
+						if(lastticks-temp==500)
 						{
-							sonar_start();
+							int distance=Senor_Using();
+							tft_prints(0,0,"sonar position %f\n LineTracker state %d",distance,ReadLineTracker(lineTracker1));
+							tft_update();
+							temp=lastticks;
 						}
+						delay(2000);
+						if(lastticks-temp>500)
+						{temp=lastticks;}
 						
-						tft_prints(0,0,"sonar position %d\n LineTracker state %d",sonar_get(),ReadLineTracker(lineTracker1));
-						tft_update();
+					
+				
+					
+    	
+    
+    
+						
+						////tft_prints(0,0,"sonar position %d\n LineTracker state %d",sonar_get(),ReadLineTracker(lineTracker1));
+						//tft_update();
         		
 				
 				if(ReadLineTracker(lineTracker1)==1){led_on(LED1);}

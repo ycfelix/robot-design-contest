@@ -1,13 +1,13 @@
 #include "UltraSonic.h"
 
+
+
 volatile uint8_t FLAG_ECHO = 0;
 volatile uint16_t SonarValue;
 
-
-
+ int get_flag(int num){int temp=FLAG_ECHO;if(FLAG_ECHO==1){FLAG_ECHO=num;}return temp;}
 void sonar_init() {
- 
-    TIM_TimeBaseInitTypeDef TIMER_InitStructure;
+	    TIM_TimeBaseInitTypeDef TIMER_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
   	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
   	TIM_TimeBaseStructInit(&TIMER_InitStructure);
@@ -25,7 +25,7 @@ void sonar_init() {
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
-
+    
 
     //sonar init
 	GPIO_InitTypeDef gpio_cfg;
@@ -43,7 +43,7 @@ void sonar_init() {
 	TIM_Cmd(TIM3, ENABLE);
 
 	//Trigger Pin
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	gpio_cfg.GPIO_Mode = GPIO_Mode_Out_PP;
 	gpio_cfg.GPIO_Pin = GPIO_Pin_13;
 	GPIO_Init(GPIOA, &gpio_cfg);
@@ -117,17 +117,16 @@ void sonar_start() {
 	GPIO_ResetBits(GPIOA, GPIO_Pin_13);
 }
 
-unsigned int sonar_get() {
+ int sonar_get() {
 	unsigned long Sonar;
 	// 354000 - Sound speed (mm/sec)
 	// 72000000 - F_CPU
 	// 16 - Timer Prescaler
 	// Result = mm
 	Sonar = (354/2) * (unsigned long)SonarValue / (72000 / 72);
-	if (Sonar > 4000) Sonar = 4000;
-	if (Sonar < 20) Sonar = 20;
-
-	return (unsigned int)Sonar;
+	
+	
+	return (int)Sonar;
 }
 
 

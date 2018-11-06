@@ -10,6 +10,7 @@
 //init ultra sonic
 void sonar_init();
 
+int get_flag(int num);
 //idk wtf is it
 void EXTI0_IRQHandler(void);
 
@@ -17,7 +18,7 @@ void EXTI0_IRQHandler(void);
 void sonar_start();
 
 //receive singal
-unsigned int sonar_get();
+ int sonar_get();
 
 //also dk wtf is it
 void TIM4_IRQHandler(void);
