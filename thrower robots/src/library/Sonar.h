@@ -5,9 +5,9 @@
 #include "delay.h"
 #define uint unsigned int
 
-#define TRIG_Send  PAout(13)
-#define ECHO_Reci  PAin(14)
+#define TRIG_Send  PAout(0)
+#define ECHO_Reci  PAin(1)
 
 void CH_SR04_Init(void);
-float Senor_Using(void);
+u16 Senor_Using(void);
 void NVIC_Config(void);

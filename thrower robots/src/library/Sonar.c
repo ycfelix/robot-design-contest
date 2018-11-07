@@ -29,12 +29,12 @@ RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
 GPIO_InitStructer.GPIO_Speed=GPIO_Speed_50MHz;
 GPIO_InitStructer.GPIO_Mode=GPIO_Mode_Out_PP;
-GPIO_InitStructer.GPIO_Pin=GPIO_Pin_13;
+GPIO_InitStructer.GPIO_Pin=GPIO_Pin_0;
 GPIO_Init(GPIOA, &GPIO_InitStructer);
 
 
 GPIO_InitStructer.GPIO_Mode=GPIO_Mode_IN_FLOATING;
-GPIO_InitStructer.GPIO_Pin=GPIO_Pin_14;
+GPIO_InitStructer.GPIO_Pin=GPIO_Pin_1;
 GPIO_Init(GPIOA, & GPIO_InitStructer);
 
 
@@ -53,23 +53,23 @@ TIM_Cmd(TIM2,DISABLE);//???????
 
 
 
-float Senor_Using(void)
+u16 Senor_Using(void)
 {
-float length=0,sum=0;
+u16 length=0,sum=0;
 u16 tim;
 int i=0;
 
 while(i!=5)
 {
-PAout(13)=1; 
-delay_us(15); 
-PAout(13)=0;
+PAout(0)=1; 
+delay_us(20); 
+PAout(0)=0;
 
-while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_14)==RESET);
+while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_1)==RESET);
 TIM_Cmd(TIM2,ENABLE);
 
 i+=1; 
-while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_14)==SET);
+while(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_1)==SET);
 TIM_Cmd(TIM2,DISABLE);
 
 tim=TIM_GetCounter(TIM2);
@@ -89,9 +89,9 @@ return length;//?????????
 
 void TIM2_IRQHandler(void) //??,????????,??????????,??????????
 {
-if(TIM_GetITStatus(TIM9,TIM_IT_Update)!=RESET)
+if(TIM_GetITStatus(TIM2,TIM_IT_Update)!=RESET)
 {
-TIM_ClearITPendingBit(TIM9,TIM_IT_Update);//??????
+TIM_ClearITPendingBit(TIM2,TIM_IT_Update);//??????
 overcount++;
  
 }

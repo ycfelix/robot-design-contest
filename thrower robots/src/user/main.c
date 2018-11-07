@@ -32,11 +32,11 @@ int main()
 	  //camera_init(RGBColour);
     //uart_rx_init(COM1,&UARTOnReceiveHandler);
 		//NVIC_Config();
-		CH_SR04_Init();
+		delay_init(72);
+	  CH_SR04_Init();
 		
 		
     int lastticks=get_ticks();
-		int temp=lastticks;
 		int distance=0;
     while(1)
 		{
@@ -44,15 +44,10 @@ int main()
             lastticks=get_ticks();
 							
 							
-						if(lastticks-temp==500)
-						{
-							distance=Senor_Using();
-							temp=lastticks;
-						}
 						//delay(2000);
-						if(lastticks-temp>500)
-						{temp=lastticks;}
-						tft_prints(0,0,"sonar position %d\n LineTracker state %d",distance,ReadLineTracker(lineTracker1));
+							
+
+						tft_prints(0,0,"sonar position %d time=%d",distance,lastticks);
 							tft_update();
 					
 				
@@ -65,11 +60,12 @@ int main()
 						//tft_update();
         		
 				
-				if(distance>0){led_on(LED2);}
+				if(distance>10){led_on(LED2);}
 				else{led_off(LED2);}
-				
-				if(ReadLineTracker(lineTracker1)==1){led_on(LED1);}
+				if(distance<10){led_on(LED1);}
 				else{led_off(LED1);}
+				//if(ReadLineTracker(lineTracker1)==1){led_on(LED1);}
+				//else{led_off(LED1);}
 				
 				
     }        
