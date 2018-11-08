@@ -19,3 +19,5 @@
 .\objects\sonar.o: .\src\stm32f10x_std\inc\stm32f10x_tim.h
 .\objects\sonar.o: src\library\ticks.h
 .\objects\sonar.o: src\library\delay.h
+.\objects\sonar.o: src\library\leds.h
+.\objects\sonar.o: src\library\gpio.h

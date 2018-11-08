@@ -19,14 +19,15 @@ int main()
 {
     // Initialize Everything Here
     rcc_init();
-	gpio_rcc_init(GPIOA);
+	//gpio_rcc_init(GPIOA);
     ticks_init();  
 		leds_init();
-		buttons_init();
-		adc_channel_init(ADC_IO_1);
-		adc_init();
+		//tim_rcc_init(TIM2);
+		//buttons_init();
+		//adc_channel_init(ADC_IO_1);
+		//adc_init();
     //call uart_rx_init 
-		lineTracker_init();
+		//lineTracker_init();
 		tft_init(PIN_ON_RIGHT,GREY,RED,WHITE,BLUE);
 		tft_clear();
 	  //camera_init(RGBColour);
@@ -46,8 +47,13 @@ int main()
 							
 						//delay(2000);
 							
+							if(lastticks%100==0)
+							{
+								distance=Senor_Using();
+							}
+							
 
-						tft_prints(0,0,"sonar position %d time=%d",distance,lastticks);
+						tft_prints(0,0,"sonar position%d time=%d",distance,lastticks);
 							tft_update();
 					
 				
@@ -60,10 +66,10 @@ int main()
 						//tft_update();
         		
 				
-				if(distance>10){led_on(LED2);}
+				if(distance>100){led_on(LED2);}
 				else{led_off(LED2);}
-				if(distance<10){led_on(LED1);}
-				else{led_off(LED1);}
+				//if(distance<100&&distance>0){led_on(LED1);}
+				//else{led_off(LED1);}
 				//if(ReadLineTracker(lineTracker1)==1){led_on(LED1);}
 				//else{led_off(LED1);}
 				
