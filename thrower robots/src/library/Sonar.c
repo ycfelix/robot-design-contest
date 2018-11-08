@@ -104,14 +104,37 @@ PAout(1)=0;
 PAout(1)=1; 
 Delay_Us(200); 
 PAout(1)=0;
+	
 
-while(PAin(2)==0);
+int exit=0;
+while(PAin(2)==0)
+{
+	for(int i=0;i<100;i++)
+		{
+			if(exit!=0){break;}
+			for(int j=0;j<10260;j++)
+			{
+				if(PAin(2)!=0){exit=1;break;}
+			}
+		}		
+}
 OpenTimerForHc();
 
 i+=1; 
-	
+if(exit==0){return -1;}	
 
-while(PAin(2)==1){};
+while(PAin(2)==1)
+{
+		for(int i=0;i<100;i++)
+		{
+			if(exit!=0){break;}
+			for(int j=0;j<10260;j++)
+			{
+				if(PAin(2)==0){exit=1;break;}
+			}
+		}		
+}
+if(exit==0){return -1;}
 TIM_Cmd(TIM6,DISABLE);
 led_on(LED1);
 tim=GetEchoTimer();
@@ -136,4 +159,10 @@ overcount++;
  
 }
 }
+
+
+
+
+
+
 
