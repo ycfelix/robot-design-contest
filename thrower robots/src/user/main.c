@@ -163,7 +163,7 @@ void sonar_start() {
 
 	GPIO_SetBits(GPIOA, GPIO_Pin_1);
 	//Delay 0x72000
-	for(i=0;i<0x7200;i++);
+	for(i=0;i<0x72;i++);
 	GPIO_ResetBits(GPIOA, GPIO_Pin_1);
 }
 
@@ -259,7 +259,7 @@ int main(void)
 	SetSysClockTo72();
 		tft_init(PIN_ON_RIGHT,GREY,RED,WHITE,BLUE);
 		tft_clear();
-    // TIMER4 ƒв≥чи за секунду викликаЇ 
+    // TIMER4 ?a3чи ?а ??кун?у aик?икаo 
     TIM_TimeBaseInitTypeDef TIMER_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
   	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
@@ -290,14 +290,15 @@ int main(void)
 			while(ticks==get_ticks());
 			ticks=get_ticks();
 
-			if(ticks%500==0)
+			if(ticks%100==0)
 			{
 				if (FLAG_ECHO == 1) {
     		//sprintf(buffer, "%d\r\n", sonar_get());
     		//USARTSend(buffer);
 					int x=sonar_get();
-							//tft_prints(0,0,"sonar position \n%d",x);
-							//tft_update();
+					tft_clear();
+							tft_prints(0,0,"sonar position \n%d",x);
+							tft_update();
 					
 					if(x>200){led_on(LED1);led_off(LED2);}
 					else if(x>0&&x<200){led_on(LED2);led_off(LED1);}
