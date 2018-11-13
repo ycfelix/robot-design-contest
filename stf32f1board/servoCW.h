@@ -5,253 +5,131 @@
 #include <iostream>
 #include "main.h"
 #include "hwnormalMode.h"
-#ifndef SERVOCW_H_
-#define SERVOCW_H_
+#ifndef SERVOHW_H_
+#define SERVOHW_H_
 
-void MoveToLeftMost(int StartPosition,int Saparation)
+int b1Pressed=0;
+int counter=0;
+//RGB as initialize
+Servo servos[3]={SERVO1,SERVO2,SERVO3};
+
+void ReverseOrder()
 {
-	int this_ticks =get_ticks();
-	int last_led_ticks=get_ticks();
-	int ServoPosition=StartPosition;
-	while (1)
-	{
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
+	int nowCount=counter;
 
-		if(this_ticks-last_led_ticks<=1000&&(this_ticks-last_led_ticks)%10==0)
-		{
-			servo_control(SERVO1,ServoPosition-=Saparation);
-		}
-		else if(this_ticks-last_led_ticks>1000)
-		{
-			break;
-		}
+	if(counter+1>=3)
+	{	Servo temp=servos[0];
+		servos[0]=servos[1];
+		servos[1]=temp;
+	}
+	else if(counter+1==2)
+	{
+		Servo temp=servos[0];
+		servos[0]=servos[2];
+		servos[2]=temp;
+	}
+	else if(counter+1==1)
+	{
+		Servo temp=servos[1];
+		servos[1]=servos[2];
+		servos[2]=temp;
 	}
 }
 
-void MoveToRightMost(int StartPosition,int Saparation)
+int GetCurrentClock()
 {
-	int this_ticks =get_ticks();
-	int last_led_ticks=get_ticks();
-	int ServoPosition=StartPosition;
-	while (1)
+	if(b1Pressed==0&&button_pressed(BUTTON1))
 	{
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
+		b1Pressed=1;
+		ReverseOrder();
 
-		if(this_ticks-last_led_ticks<=1000&&(this_ticks-last_led_ticks)%10==0)
-		{
-			servo_control(SERVO1,ServoPosition+=Saparation);
-		}
-		else if(this_ticks-last_led_ticks>1000)
-		{
-			break;
-		}
 	}
-}
-
-void CW2()
-{
-
-	servo_init(SERVO1, 23, 60000, 2700);
-	int this_ticks =get_ticks();
-	//int last_led_ticks=get_ticks();
-	while (1)
+	else if(b1Pressed==1&&!button_pressed(BUTTON1))
 	{
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
+		b1Pressed=0;
+	}
 
-		if(button_pressed(BUTTON1))
-		{
-			MoveToRightMost(2700,(6300-2700)/100);
-			MoveToLeftMost(6300,(6300-2700)/100);
-		}
-	}
-}
-
-
-int NumButton1Pressed=0;
-int NumButton2Pressed=0;
-int StartPosition=0;
-int Saparation=14;
-int But1State=0;
-int But2State=0;
-void RaiseDutyCycle();
-void DropDutyCycle();
-void GetInput()
-{
-	if(But1State==0&&button_pressed(BUTTON1))
-	{
-		But1State=1;
-		NumButton1Pressed++;
-	}
-	else if(But1State==1&&!button_pressed(BUTTON1))
-	{
-		But1State=0;
-	}
-	if(But2State==0&&button_pressed(BUTTON2))
-	{
-		But2State=1;
-		NumButton2Pressed++;
-	}
-	else if(But2State==1&&!button_pressed(BUTTON2))
-	{
-		But2State=0;
-	}
-}
-
-int ticks()
-{
-
-	GetInput();
-	if(NumButton1Pressed>0)
-	{
-		RaiseDutyCycle();
-	}
-	if(NumButton2Pressed>0)
-	{
-		DropDutyCycle();
-	}
 	return get_ticks();
 }
 
-void DropDutyCycle()
+
+
+void MoveToLeftMost(Servo SERVO,int StartPosition,int Saparation, int counter)
 {
 	int this_ticks =get_ticks();
 	int last_led_ticks=get_ticks();
-	int MotorPosition=StartPosition;
+	int ServoPosition=StartPosition;
 	while (1)
 	{
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
-		GetInput();
+		//exit condition if suddenly clicked button
+		//if(servos[counter]!=SERVO){servo_control(SERVO,0);break;}
 
-		if(this_ticks-last_led_ticks<=1000&&(this_ticks-last_led_ticks)%100==0)
+
+
+		while (GetCurrentClock() == this_ticks);
+		this_ticks = GetCurrentClock();
+
+		if(this_ticks-last_led_ticks<=1500&&(this_ticks-last_led_ticks)%15==0)
 		{
-
-			if(MotorPosition-Saparation<0&&MotorPosition-Saparation>=-1440)
-			{
-				motor_control(MOTOR1,-1*(MotorPosition-=Saparation),0);
-			}
-			else if(MotorPosition-Saparation>=0)
-			{
-				motor_control(MOTOR1,MotorPosition-=Saparation,1);
-			}
-
+			servo_control(SERVO,ServoPosition-=Saparation);
 		}
-		else if(this_ticks-last_led_ticks>1000)
+		else if(this_ticks-last_led_ticks>1500)
 		{
-			if(StartPosition - 144>=0)
-			{motor_control(MOTOR1,StartPosition-=144,1);}
-			else if(StartPosition - 144<0&&StartPosition - 144>=-1440)
-			{motor_control(MOTOR1,-1*(StartPosition-=144),0);}
-			NumButton2Pressed--;
+			servo_control(SERVO,0);
 			break;
 		}
 	}
 }
 
-void RaiseDutyCycle()
+void MoveToRightMost(Servo SERVO,int StartPosition,int Saparation, int counter)
 {
-	int this_ticks =get_ticks();
-	int last_led_ticks=get_ticks();
-	int MotorPosition=StartPosition;
+	int this_ticks =GetCurrentClock();
+	int last_led_ticks=GetCurrentClock();
+	int ServoPosition=StartPosition;
 	while (1)
 	{
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
-		GetInput();
+		//exit condition if suddenly clicked button
+		//if(servos[counter]!=SERVO){servo_control(SERVO,0);break;}
 
-		if(this_ticks-last_led_ticks<=1000&&(this_ticks-last_led_ticks)%100==0)
+		while (GetCurrentClock() == this_ticks);
+		this_ticks = GetCurrentClock();
+
+		if(this_ticks-last_led_ticks<=1500&&(this_ticks-last_led_ticks)%15==0)
 		{
-
-			if(MotorPosition+Saparation>=0&&MotorPosition+Saparation<=1440)
-			{
-				motor_control(MOTOR1,(MotorPosition+=Saparation),1);
-			}
-			else if(MotorPosition+Saparation<0)
-			{
-				motor_control(MOTOR1,-1*(MotorPosition+=Saparation),0);
-			}
-
+			servo_control(SERVO,ServoPosition+=Saparation);
 		}
-		else if(this_ticks-last_led_ticks>1000)
+		else if(this_ticks-last_led_ticks>1500)
 		{
-			if(StartPosition + 144>=0&&StartPosition + 144<=1440)
-			{motor_control(MOTOR1,StartPosition+=144,1);}
-			else if(StartPosition + 144<0)
-			{motor_control(MOTOR1,-1*(StartPosition+=144),0);}
-			NumButton1Pressed--;
+			servo_control(SERVO,6000);
 			break;
 		}
 	}
 }
 
-void CW4()
+void HW2()
 {
 
-	motor_init(MOTOR1, 0, 1440,0,1);
-	int this_ticks =ticks();
-	while (1)
-	{
-		while (ticks() == this_ticks);
-		this_ticks = ticks();
-	}
-
-}
-
-
-
-
-void CW3()
-{
-	int button1_state=0;
-	int button2_state=0;
-	int magnitude=0;
-	int TenthDutyCycle=720/10;
-	motor_init(MOTOR1, 1, 720,magnitude,1);
+	servo_init(SERVO1, 9, 6000,0);
+	servo_init(SERVO2, 9, 6000,0);
+	servo_init(SERVO3, 9, 6000,0);
 	int this_ticks =get_ticks();
+
 	//int last_led_ticks=get_ticks();
-
 	while (1)
 	{
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
+		while (GetCurrentClock() == this_ticks);
+		this_ticks = GetCurrentClock();
 
-		if(button1_state==0&&button_pressed(BUTTON1))
-		{
-			if(magnitude<=-72)
+			MoveToRightMost(servos[counter],0,(6000)/100,counter);
+			MoveToLeftMost(servos[counter],6000,(6000)/100,counter);
+			counter++;
+			if(counter>=3)
 			{
-				motor_control(MOTOR1,-1*(magnitude+=TenthDutyCycle),0);
-				button1_state=1;
+				counter=0;
 			}
-			else if(magnitude>-72&&magnitude<=648)
-			{
-				motor_control(MOTOR1,magnitude+=TenthDutyCycle,1);
-				button1_state=1;
-			}
-		}
-		else if(button1_state==1&&!button_pressed(BUTTON1))
-		{
-			button1_state=0;
-		}
-		if(button2_state==0&&button_pressed(BUTTON2))
-		{
-			if(magnitude>=72)
-			{
-				motor_control(MOTOR1,magnitude-=TenthDutyCycle,1);
-				button2_state=1;
-			}
-			else if(magnitude<72&&magnitude>=-648)
-			{
-				motor_control(MOTOR1,-1*(magnitude-=TenthDutyCycle),0);
-				button2_state=1;
-			}
-		}
-		else if(button2_state==1&&!button_pressed(BUTTON2))
-		{
-			button2_state=0;
-		}
 	}
 }
-#endif /* SERVOCW_H_ */
+
+
+
+#endif /* SERVOHW_H_ */
