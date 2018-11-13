@@ -30,17 +30,19 @@ Build target 'Default'
 compiling main.c...
 .\src\library\lineTracker.h(24): warning:  #1-D: last line of file ends without a newline
   #endif
-src\user\main.c(149): warning:  #68-D: integer conversion resulted in a change of sign
-  		motor_control(MOTOR2,72,-1);
-src\user\main.c(183): warning:  #550-D: variable "LT1_state"  was set but never used
-  	int LT1_state=0;
-src\user\main.c(184): warning:  #177-D: variable "LT2_state"  was declared but never referenced
+src\user\main.c(153): warning:  #68-D: integer conversion resulted in a change of sign
+  		motor_control(MOTOR2,6000,-1);
+src\user\main.c(191): warning:  #177-D: variable "LT2_state"  was declared but never referenced
   	int LT2_state=0;
-src\user\main.c: 4 warnings, 0 errors
+src\user\main.c(192): warning:  #177-D: variable "magnitude"  was declared but never referenced
+  	int magnitude=0;
+src\user\main.c(193): warning:  #177-D: variable "TenthDutyCycle"  was declared but never referenced
+  	int TenthDutyCycle=60000/10;
+src\user\main.c: 5 warnings, 0 errors
 linking...
-Program Size: Code=5576 RO-data=744 RW-data=456 ZI-data=1728  
+Program Size: Code=5756 RO-data=744 RW-data=460 ZI-data=1732  
 FromELF: creating hex file...
-".\Objects\ustrobo18_internal.axf" - 0 Error(s), 4 Warning(s).
+".\Objects\ustrobo18_internal.axf" - 0 Error(s), 5 Warning(s).
 
 <h2>Software Packages used:</h2>
 

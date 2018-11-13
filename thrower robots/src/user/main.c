@@ -7,29 +7,41 @@
 #include "pwm.h"
 #include "lineTracker.h"
 #include "leds.h"
+#include "buttons.h"
 
-
+//coordinate structure
 typedef struct
 {
 	int x;
 	int y;
 } Coordinate;
 
+//not useful for now
 enum Direction{FORWARD=1,BACKWARD=-1};
 
+
+//direction
 typedef enum {EAST=0,WEST=180,NORTH=90,SOUTH=270,CLKWISE,ANTICLKWISE}CompusDir;
 
+//a set of robot action, will go from start zone to throwing zone
 CompusDir RobotActions[]={WEST,WEST,WEST,WEST,EAST,CLKWISE,
 		NORTH,NORTH,NORTH,NORTH,NORTH,CLKWISE,EAST,EAST,EAST,EAST};
-int Actions_Length=sizeof(RobotActions)/sizeof(RobotActions[0]);
-Coordinate CurrentPosition;
 
-// they will stop when they see a white line
+		//size of action array
+int Actions_Length=sizeof(RobotActions)/sizeof(RobotActions[0]);
+		
+		//coordinate of the robot
+Coordinate CurrentPosition;
+		
+//debounce variable to prevent mutiple access
+int LT1_state = 0;
+
+// Move east until it sees a white line and then stop
 void MoveEast(int dir)
 {
-	int LT1_state = 0;
-	motor_control(MOTOR1,72,dir);
-	motor_control(MOTOR2,72,dir);
+	//start moving
+	motor_control(MOTOR1,6000,dir);
+	motor_control(MOTOR2,6000,dir);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -37,9 +49,10 @@ void MoveEast(int dir)
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
-			if(LT1_state==1)
+			//debouncing condition
+			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
 			{
-				break;
+				LT1_state=0;
 			}
 
 
@@ -49,16 +62,17 @@ void MoveEast(int dir)
 				LT1_state=1;
 				motor_control(MOTOR1,0,dir);
 				motor_control(MOTOR2,0,dir);
+				//update the robots coordinate
 				CurrentPosition.x++;
+				return;
 			}
 		}
 }
 
 void MoveWest(int dir)
 {
-	int LT1_state = 0;
-	motor_control(MOTOR1,72,dir);
-	motor_control(MOTOR2,72,dir);
+	motor_control(MOTOR1,6000,dir);
+	motor_control(MOTOR2,6000,dir);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -66,9 +80,9 @@ void MoveWest(int dir)
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
-			if(LT1_state==1)
+			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
 			{
-				break;
+				LT1_state=0;
 			}
 
 
@@ -79,15 +93,15 @@ void MoveWest(int dir)
 				motor_control(MOTOR1,0,dir);
 				motor_control(MOTOR2,0,dir);
 				CurrentPosition.x--;
+				return;
 			}
 		}
 }
 
 void MoveNorth(int dir)
 {
-	int LT1_state = 0;
-	motor_control(MOTOR1,72,dir);
-	motor_control(MOTOR2,72,dir);
+	motor_control(MOTOR1,6000,dir);
+	motor_control(MOTOR2,6000,dir);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -95,9 +109,9 @@ void MoveNorth(int dir)
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
-			if(LT1_state==1)
+			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
 			{
-				break;
+				LT1_state=0;
 			}
 
 
@@ -108,15 +122,15 @@ void MoveNorth(int dir)
 				motor_control(MOTOR1,0,dir);
 				motor_control(MOTOR2,0,dir);
 				CurrentPosition.y--;
+				return;
 			}
 		}
 }
 
 void MoveSouth(int dir)
 {
-	int LT1_state = 0;
-	motor_control(MOTOR1,72,dir);
-	motor_control(MOTOR2,72,dir);
+	motor_control(MOTOR1,6000,dir);
+	motor_control(MOTOR2,6000,dir);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -124,9 +138,9 @@ void MoveSouth(int dir)
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
-			if(LT1_state==1)
+			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
 			{
-				break;
+				LT1_state=0;
 			}
 
 
@@ -137,6 +151,7 @@ void MoveSouth(int dir)
 				motor_control(MOTOR1,0,dir);
 				motor_control(MOTOR2,0,dir);
 				CurrentPosition.y++;
+				return;
 			}
 		}
 }
@@ -144,9 +159,9 @@ void MoveSouth(int dir)
 
 void TurnClockWise()
 {
-	int LT1_state = 0;
-		motor_control(MOTOR1,72,1);
-		motor_control(MOTOR2,72,-1);
+	
+		motor_control(MOTOR1,6000,1);
+		motor_control(MOTOR2,6000,-1);
 		int this_ticks = get_ticks();
 
 		while (1)
@@ -154,23 +169,28 @@ void TurnClockWise()
 				while (get_ticks() == this_ticks);
 				this_ticks = get_ticks();
 
-				if(LT1_state==1)
-				{
-					break;
-				}
+			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
+			{
+				LT1_state=0;
+			}
 
 
 				//Stop when It read white lines
 				if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
 				{
 					LT1_state=1;
+					motor_control(MOTOR1,0,1);
+				  motor_control(MOTOR2,0,1);
+					return;
+					
 				}
 			}
 }
 
+//return absolute value of a number
 int abs(int num)
 {
-	if(num<0){num*=0;}
+	if(num<0){num*=-1;}
 	
 	return num;
 }
@@ -178,17 +198,16 @@ int abs(int num)
 
 void Thrower()
 {
+	
+	//initialize current position=5,5 coordinate
 	CurrentPosition.x=5;
 	CurrentPosition.y=5;
-	int LT1_state=0;
-	int LT2_state=0;
-	int magnitude=0;
-	int TenthDutyCycle=720/10;
-	int init=0;
+	
+  //init enter once only
+	int init=1;
+	
+	//initial direction is west
 	CompusDir direction=WEST;
-	motor_init(MOTOR1, 1, 720,magnitude,1);
-	motor_init(MOTOR2, 1, 720,magnitude,1);
-	lineTracker_init();
 	int this_ticks =get_ticks();
 	//int last_led_ticks=get_ticks();
 
@@ -197,18 +216,14 @@ void Thrower()
 		while (get_ticks() == this_ticks);
 		this_ticks = get_ticks();
 
-		//only enter once for getting the car to start
-		if(init==0&&ReadLineTracker(lineTracker1)==1)
-		{
-			motor_control(MOTOR1,TenthDutyCycle,direction);
-			motor_control(MOTOR2,TenthDutyCycle,direction);
-			init=1;
-			LT1_state=1;
-		}
+		
 
+			int dir=1;
+		
+		//only enter once for getting the car to start
+		//ideally will go to the throwing zone
 		if(init==1)
 		{
-			int dir=1;
 			for(int i=0;i<Actions_Length;i++)
 			{
 				switch(RobotActions[i])
@@ -220,9 +235,13 @@ void Thrower()
 					case CLKWISE:TurnClockWise();break;
 					default:break;
 				}
+				//delay 2s to hold the car
+				delay(2000);
+				
 			}
 			init=2;
 		}
+		
 	}
 }
 int main()
@@ -231,6 +250,16 @@ int main()
 	//gpio_rcc_init(GPIOA);
    ticks_init();  
 	leds_init();
+	buttons_init();
+	
+	//initialize motor, prescalar 23, autoreload=60000
+	motor_init(MOTOR1, 23, 60000,0,1);
+	motor_init(MOTOR2, 23, 60000,0,1);
+	
+	//initialize linetracker
+	lineTracker_init();
+
+	//enter thrower robot movement subroutine
 	Thrower();
 	return 0;
 }

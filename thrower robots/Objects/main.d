@@ -24,3 +24,4 @@
 .\objects\main.o: .\src\library\pwm.h
 .\objects\main.o: .\src\library\lineTracker.h
 .\objects\main.o: .\src\library\leds.h
+.\objects\main.o: .\src\library\buttons.h
