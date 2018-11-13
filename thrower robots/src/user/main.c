@@ -45,7 +45,7 @@ void MoveEast(int dir)
 	int this_ticks = get_ticks();
 
 	while (1)
-		{
+	{
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
@@ -66,7 +66,7 @@ void MoveEast(int dir)
 				CurrentPosition.x++;
 				return;
 			}
-		}
+	}
 }
 
 void MoveWest(int dir)
@@ -76,7 +76,7 @@ void MoveWest(int dir)
 	int this_ticks = get_ticks();
 
 	while (1)
-		{
+	{
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
@@ -95,7 +95,7 @@ void MoveWest(int dir)
 				CurrentPosition.x--;
 				return;
 			}
-		}
+	}
 }
 
 void MoveNorth(int dir)
@@ -105,7 +105,7 @@ void MoveNorth(int dir)
 	int this_ticks = get_ticks();
 
 	while (1)
-		{
+	{
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
@@ -124,7 +124,7 @@ void MoveNorth(int dir)
 				CurrentPosition.y--;
 				return;
 			}
-		}
+	}
 }
 
 void MoveSouth(int dir)
@@ -134,7 +134,7 @@ void MoveSouth(int dir)
 	int this_ticks = get_ticks();
 
 	while (1)
-		{
+	{
 			while (get_ticks() == this_ticks);
 			this_ticks = get_ticks();
 
@@ -153,7 +153,7 @@ void MoveSouth(int dir)
 				CurrentPosition.y++;
 				return;
 			}
-		}
+	}
 }
 
 
@@ -165,9 +165,9 @@ void TurnClockWise()
 		int this_ticks = get_ticks();
 
 		while (1)
-			{
-				while (get_ticks() == this_ticks);
-				this_ticks = get_ticks();
+		{
+			while (get_ticks() == this_ticks);
+			this_ticks = get_ticks();
 
 			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
 			{
@@ -184,7 +184,7 @@ void TurnClockWise()
 					return;
 					
 				}
-			}
+		}
 }
 
 //return absolute value of a number
@@ -218,7 +218,7 @@ void Thrower()
 
 		
 
-			int dir=1;
+		int dir=1;
 		
 		//only enter once for getting the car to start
 		//ideally will go to the throwing zone
@@ -248,7 +248,7 @@ int main()
 {
 	rcc_init();
 	//gpio_rcc_init(GPIOA);
-   ticks_init();  
+  ticks_init();  
 	leds_init();
 	buttons_init();
 	
@@ -260,6 +260,13 @@ int main()
 	lineTracker_init();
 
 	//enter thrower robot movement subroutine
+	while(1)
+{
+	if(button_pressed(BUTTON1))
+	{
+		break;
+	}
+}
 	Thrower();
 	return 0;
 }
