@@ -125,8 +125,8 @@ void TurnClockWise()
 				if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
 				{
 					LT1_state=1;
-					motor_control(MOTOR1,6000,1);
-				    motor_control(MOTOR2,6000,1);
+					motor_control(MOTOR1,1,1);
+				    motor_control(MOTOR2,1,1);
 					return;
 					
 				}
@@ -180,7 +180,7 @@ void AutoModeThrower()
 					default:break;
 				}
 				//delay 2s to hold the car
-				delay(1000);			
+				delay(5000);			
 			}
 			init=2;
 		}
@@ -194,7 +194,6 @@ int main()
 	leds_init();
 	buttons_init();
 	
-	
 	//initialize motor, prescalar 19, autoreload=720
 	motor_init(MOTOR1, 39, 6000,1,1);
 	motor_init(MOTOR2, 39, 6000,1,1);
@@ -205,9 +204,8 @@ int main()
 	//enter thrower robot movement subroutine
 	while(1)
 {
-	if(button_pressed(BUTTON1)==1)
+	if(button_pressed(BUTTON1))
 	{
-		led_on(LED1);
 		break;
 	}
 }

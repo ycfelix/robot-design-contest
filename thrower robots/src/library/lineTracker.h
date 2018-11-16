@@ -1,8 +1,6 @@
 #ifndef __LINETRACKER_H
 #define __LINETRACKER_H
 
-
-
 #include "gpio.h"
 
 // totally 2 linetrackers are used

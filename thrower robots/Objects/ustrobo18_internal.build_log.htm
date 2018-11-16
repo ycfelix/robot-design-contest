@@ -28,21 +28,15 @@ Project File Date:  11/12/2018
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Default'
 compiling main.c...
-.\src\library\lineTracker.h(24): warning:  #1-D: last line of file ends without a newline
+.\src\library\lineTracker.h(22): warning:  #1-D: last line of file ends without a newline
   #endif
-src\user\main.c(153): warning:  #68-D: integer conversion resulted in a change of sign
-  		motor_control(MOTOR2,6000,-1);
-src\user\main.c(191): warning:  #177-D: variable "LT2_state"  was declared but never referenced
-  	int LT2_state=0;
-src\user\main.c(192): warning:  #177-D: variable "magnitude"  was declared but never referenced
-  	int magnitude=0;
-src\user\main.c(193): warning:  #177-D: variable "TenthDutyCycle"  was declared but never referenced
-  	int TenthDutyCycle=60000/10;
-src\user\main.c: 5 warnings, 0 errors
+src\user\main.c(110): warning:  #68-D: integer conversion resulted in a change of sign
+  		motor_control(MOTOR2,SPEED,-1);
+src\user\main.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=5756 RO-data=744 RW-data=460 ZI-data=1732  
+Program Size: Code=5432 RO-data=756 RW-data=464 ZI-data=1728  
 FromELF: creating hex file...
-".\Objects\ustrobo18_internal.axf" - 0 Error(s), 5 Warning(s).
+".\Objects\ustrobo18_internal.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
