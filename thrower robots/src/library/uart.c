@@ -191,6 +191,4 @@ static void uart_irq_handler(UARTPort* uart) {
 void USART1_IRQHandler(void) {
 	uart_irq_handler(&UARTPort1);
 }
-void USART3_IRQHandler(void) {
-	uart_irq_handler(&UARTPort3);
-}
+void USART3_IRQHandler(void);

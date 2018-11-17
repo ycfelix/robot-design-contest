@@ -1,13 +1,21 @@
-#include "main.h"
 #include "rcc.h"
 #include "ticks.h"
 #include "gpio.h"
-#include "uart.h"
-#include "lcd_main.h"
-#include "pwm.h"
-#include "lineTracker.h"
 #include "leds.h"
 #include "buttons.h"
+#include "buzzer.h"
+#include "uart.h"
+#include "lcd_main.h"
+#include "oled.h"
+#include "camera.h"
+#include "pwm.h"
+#include "adc.h"
+#include "main.h"
+#include "lineTracker.h"
+
+const int AUTORELOAD=6000;
+
+const int TURNINGTIME=1000;
 
 //coordinate structure
 typedef struct
@@ -17,9 +25,15 @@ typedef struct
 } Coordinate;
 
 //not useful for now 
-enum Direction{FORWARD=1,BACKWARD=-1};
+typedef enum {FORWARD=1,BACKWARD=-1,LEFT=2,RIGHT=3}Direction;
+
+typedef enum {LEFTWHEEL,RIGHTWHEEL}Wheel;
+
+void ManualMove(Direction);
 
 const int SPEED=6000/5;
+int LeftCurrentPower=SPEED;
+int RightCurrentPower=SPEED;
 
 
 //direction
@@ -58,6 +72,101 @@ Coordinate CurrentPosition;
 int LT1_state = 0;
 int LT2_state=0;
 
+
+
+void Usart3_Send_Data(char *string)
+{
+    while(*string)
+    {
+        /* ????? USART1 */
+        USART_SendData(USART3, (unsigned short int) *string++);
+ 
+        /* ???????? */
+        while (USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
+    }
+}
+
+
+extern void USART3_IRQHandler(void)
+{
+    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
+
+        switch((char)USART_ReceiveData(USART3))
+        {
+            case 'W':ManualMove(FORWARD);Usart3_Send_Data("Forward \n");break;
+            case 'A':ManualMove(LEFT);Usart3_Send_Data("Turn Left \n");break;
+            case 'S':ManualMove(BACKWARD);Usart3_Send_Data("Backward \n");break;
+            case 'D':ManualMove(RIGHT);Usart3_Send_Data("Turn Right \n");break;
+            case 'L':Usart3_Send_Data("Left add power \n");break;
+            case 'X':Usart3_Send_Data("Left sub power \n");break;
+            case 'R':Usart3_Send_Data("Right add power \n");break;
+            case 'Y':Usart3_Send_Data("Right sub power \n");break;
+        }
+    }
+}
+
+
+void ManualMove(Direction dir)
+{
+    int this_ticks =get_ticks();
+    int Current=this_ticks;
+
+    switch(dir)
+    {
+        case FORWARD: motor_control(MOTOR1,SPEED,dir); motor_control(MOTOR2,SPEED,dir);break;
+        case BACKWARD: motor_control(MOTOR1,SPEED,dir); motor_control(MOTOR2,SPEED,dir);break;
+        case LEFT: motor_control(MOTOR1,LeftCurrentPower,-1*dir); motor_control(MOTOR2,RightCurrentPower,dir);break;
+        case RIGHT: motor_control(MOTOR1,LeftCurrentPower,dir); motor_control(MOTOR2,RightCurrentPower,-1*dir);break;
+        default:break;
+    }
+
+    while(1)
+    {
+        while (get_ticks() == this_ticks);
+		this_ticks = get_ticks();
+
+        if(this_ticks-Current>=TURNINGTIME)
+        {
+            motor_control(MOTOR1,1,1);
+            motor_control(MOTOR2,1,1);
+            return;
+        }
+    }   
+}
+
+void AddPower(Wheel wheel)
+{
+    switch(wheel)
+    {
+        case LEFTWHEEL:
+        if(LeftCurrentPower+SPEED<=AUTORELOAD)
+        {LeftCurrentPower+=SPEED;}
+        break;
+        case RIGHTWHEEL:
+        if(RightCurrentPower+SPEED<=AUTORELOAD)
+        {RightCurrentPower+=SPEED;}
+        break;
+    }
+}
+
+
+void MinusPower(Wheel wheel)
+{
+    switch(wheel)
+    {
+        case LEFTWHEEL:
+        if(LeftCurrentPower-SPEED>=1)
+        {LeftCurrentPower-=SPEED;}
+        break;
+        case RIGHTWHEEL:
+        if(RightCurrentPower-SPEED>=1)
+        {RightCurrentPower-=SPEED;}
+        break;
+    }
+}
+
+
+
 // Move east until it sees a white line and then stop
 void Move(Actions Compus,int dir)
 {
@@ -68,35 +177,34 @@ void Move(Actions Compus,int dir)
 
 	while (1)
 	{
-			while (get_ticks() == this_ticks);
-			this_ticks = get_ticks();
+		while (get_ticks() == this_ticks);
+		this_ticks = get_ticks();
 
-			//debouncing condition
-			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
-			{
-				LT1_state=0;
-			}
+		//debouncing condition
+		if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
+		{
+			LT1_state=0;
+		}
 
 
-			//Stop when It read white lines
-			if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
-			{
-				LT1_state=1;
-				motor_control(MOTOR1,1,dir);
-				motor_control(MOTOR2,1,dir);
-				//update the robots coordinate
-
-                switch(Compus)
-                {
-                    case EAST:CurrentPosition.x++;break;
-					case WEST:CurrentPosition.x--;break;
-					case NORTH:CurrentPosition.y--;break;
-					case SOUTH:CurrentPosition.y++;break;
-                    default:break;
-                }
+		//Stop when It read white lines
+		if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
+		{
+			LT1_state=1;
+			motor_control(MOTOR1,1,dir);
+			motor_control(MOTOR2,1,dir);
+			//update the robots coordinate
+            switch(Compus)
+            {
+                case EAST:CurrentPosition.x++;break;
+				case WEST:CurrentPosition.x--;break;
+				case NORTH:CurrentPosition.y--;break;
+				case SOUTH:CurrentPosition.y++;break;
+                default:break;
+            }
 				
-				return;
-			}
+			return;
+		}
 	}
 }
 
@@ -106,31 +214,28 @@ void Move(Actions Compus,int dir)
 void TurnClockWise()
 {
 	
-		motor_control(MOTOR1,SPEED,1);
-		motor_control(MOTOR2,SPEED,-1);
-		int this_ticks = get_ticks();
+	motor_control(MOTOR1,SPEED,1);
+	motor_control(MOTOR2,SPEED,-1);
+	int this_ticks = get_ticks();
 
-		while (1)
+	while (1)
+	{
+		while (get_ticks() == this_ticks);
+		this_ticks = get_ticks();
+
+		if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
 		{
-			while (get_ticks() == this_ticks);
-			this_ticks = get_ticks();
-
-			if(LT1_state==1&&ReadLineTracker(lineTracker1)==0)
-			{
-				LT1_state=0;
-			}
-
-
-				//Stop when It read white lines
-				if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
-				{
-					LT1_state=1;
-					motor_control(MOTOR1,6000,1);
-				    motor_control(MOTOR2,6000,1);
-					return;
-					
-				}
+			LT1_state=0;
 		}
+		//Stop when It read white lines
+		if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
+		{
+	    	LT1_state=1;
+			motor_control(MOTOR1,1,1);
+		    motor_control(MOTOR2,1,1);
+			return;					
+		}
+	}
 }
 
 //return absolute value of a number
@@ -142,9 +247,19 @@ int abs(int num)
 }
 
 
+void ManualMode()
+{
+    while(1)
+    {
+        ;   
+    }
+}
+
+
+
+
 void AutoModeThrower()
 {
-	
 	//initialize current position=5,5 coordinate
 	CurrentPosition.x=5;
 	CurrentPosition.y=5;
@@ -180,38 +295,50 @@ void AutoModeThrower()
 					default:break;
 				}
 				//delay 2s to hold the car
-				delay(1000);			
+				delay(3000);			
 			}
 			init=2;
 		}
+        break;
 	}
 }
+
+
+void UARTOnReceiveHandler(const u8 received){
+    //whenever you type something in coolterm, 
+    //each character will triger this function 
+    //the character will be the argument for this function
+    return;
+}
+
+
 int main()
 {
 	rcc_init();
 	//gpio_rcc_init(GPIOA);
-  ticks_init();  
+    ticks_init();  
 	leds_init();
 	buttons_init();
-	
-	
-	//initialize motor, prescalar 19, autoreload=720
-	motor_init(MOTOR1, 39, 6000,1,1);
-	motor_init(MOTOR2, 39, 6000,1,1);
+    tft_init(1, BLACK, WHITE, RED, YELLOW);
+    uart_init(COM3, 115200);
+	uart_rx_init(COM3,UARTOnReceiveHandler);
+	//initialize motor, prescalar 10, autoreload=6000
+	motor_init(MOTOR1, 39, AUTORELOAD,1,1);
+	motor_init(MOTOR2, 39, AUTORELOAD,1,1);
 	
 	//initialize linetracker
 	lineTracker_init();
 
 	//enter thrower robot movement subroutine
 	while(1)
-{
-	if(button_pressed(BUTTON1)==1)
-	{
-		led_on(LED1);
-		break;
-	}
-}
+    {
+	    if(button_pressed(BUTTON1))
+	    {
+	    	break;
+	    }
+    }
+
 	AutoModeThrower();
+    ManualMode();
 	return 0;
 }
-
