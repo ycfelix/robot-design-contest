@@ -17,6 +17,10 @@ const int AUTORELOAD=6000;
 
 const int TURNINGTIME=1000;
 
+const int MOVEMENTTIME=2000;
+
+char ReceivedAction='\0';
+
 //coordinate structure
 typedef struct
 {
@@ -32,7 +36,9 @@ typedef enum {LEFTWHEEL,RIGHTWHEEL}Wheel;
 void ManualMove(Direction);
 
 const int SPEED=6000/5;
+
 int LeftCurrentPower=SPEED;
+
 int RightCurrentPower=SPEED;
 
 
@@ -51,15 +57,17 @@ typedef enum
     SHUFFLERELEASE,
 	SHOOT,
 	UNSHOOT
+
 }Actions;
 
 //a set of robot action, will go from start zone to throwing zone
 Actions RobotActions[]=
-		{		WEST,WEST,WEST,WEST,EAST,
-				CLKWISE,
-				NORTH,NORTH,NORTH,NORTH,NORTH,
-				CLKWISE,
-				EAST,EAST,EAST,EAST
+		{		
+			WEST,WEST,WEST,WEST,EAST,
+			CLKWISE,
+			NORTH,NORTH,NORTH,NORTH,NORTH,
+			CLKWISE,
+			EAST,EAST,EAST,EAST
 		};
 
 		//size of action array
@@ -73,25 +81,9 @@ int LT1_state = 0;
 int LT2_state=0;
 
 
-
-void Usart3_Send_Data(char *string)
-{
-    while(*string)
-    {
-        /* ????? USART1 */
-        USART_SendData(USART3, (unsigned short int) *string++);
- 
-        /* ???????? */
-        while (USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-    }
-}
-
-
-
-
 void ManualMove(Direction dir)
 {
-    int this_ticks =0;
+    int this_ticks =get_ticks();
     int Current=this_ticks;
 
     switch(dir)
@@ -105,14 +97,17 @@ void ManualMove(Direction dir)
 
     while(1)
     {
-			int i=0;
-			led_on(LED1);
-       for (;i<720000;i++){;}
-			led_off(LED1);
+		while (get_ticks() == this_ticks);
+		this_ticks = get_ticks();
 
-            motor_control(MOTOR1,1,1);
-            motor_control(MOTOR2,1,1);
-            return;
+		if(this_ticks-Current>=MOVEMENTTIME)
+		{
+ 			motor_control(MOTOR1,1,1);
+       	 	motor_control(MOTOR2,1,1);
+         	return;
+		}
+
+       
       
     }   
 }
@@ -231,10 +226,37 @@ int abs(int num)
 
 
 void ManualMode()
-{
+{	
+	
+	int this_ticks =get_ticks();
     while(1)
     {
-        ;   
+ 		while (get_ticks() == this_ticks);
+		this_ticks = get_ticks();
+
+    	switch((char)ReceivedAction)
+     {
+         case 'w':led_on(LED2);ManualMove(FORWARD);ReceivedAction='\0';
+		 uart_tx_str(COM3,"forward coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);break;
+         case 'a':led_off(LED2);ManualMove(LEFT);uart_tx_str(COM3," left coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);
+		 ReceivedAction='\0';break;
+         case 's':ManualMove(BACKWARD);uart_tx_str(COM3,"back coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);
+		 ReceivedAction='\0';break;
+         case 'd':ManualMove(RIGHT);uart_tx_str(COM3,"right coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);
+		 ReceivedAction='\0';break;
+         case 'l':AddPower(LEFTWHEEL);uart_tx_str(COM3,"add left power= %d\n",LeftCurrentPower);ReceivedAction='\0';break;
+         case 'x':MinusPower(LEFTWHEEL);uart_tx_str(COM3,"sub left power= %d\n",LeftCurrentPower);ReceivedAction='\0';break;
+         case 'r':AddPower(RIGHTWHEEL);uart_tx_str(COM3,"add right power = %d\n",RightCurrentPower);ReceivedAction='\0';break;
+         case 'y':MinusPower(RIGHTWHEEL);uart_tx_str(COM3,"sub right power = %d\n",RightCurrentPower);ReceivedAction='\0';break;
+		 default: 
+		 
+		 if(ReceivedAction!='\0')
+		 {
+			 uart_tx_str(COM3,"invalid action\n");
+			 ReceivedAction='\0';
+		 }
+		 break;
+     }  
     }
 }
 
@@ -289,18 +311,8 @@ void AutoModeThrower()
 
 void UARTOnReceiveHandler(const u8 received){
 	
-     switch((char)received)
-     {
-         case 'w':led_on(LED2); uart_tx_str(COM3,"forward\n");ManualMove(FORWARD);break;
-         case 'a':led_off(LED2);ManualMove(LEFT);uart_tx_str(COM3,"left \n");break;
-         case 's':ManualMove(BACKWARD);uart_tx_str(COM3,"back \n");break;
-         case 'd':ManualMove(RIGHT);uart_tx_str(COM3,"right\n");break;
-         case 'l':AddPower(LEFTWHEEL);uart_tx_str(COM3,"add left power\n");break;
-         case 'x':MinusPower(LEFTWHEEL);uart_tx_str(COM3,"sub left power\n");break;
-         case 'r':AddPower(RIGHTWHEEL);uart_tx_str(COM3,"add right power\n");break;
-         case 'y':MinusPower(RIGHTWHEEL);uart_tx_str(COM3,"sub right power\n");break;
-				 default:uart_tx_str(COM3,"invalid action\n"); break;
-     }
+	if(ReceivedAction=='\0')
+	{ReceivedAction=received;}
     return;
 }
 
@@ -308,13 +320,12 @@ void UARTOnReceiveHandler(const u8 received){
 int main()
 {
 	rcc_init();
-	//gpio_rcc_init(GPIOA);
     ticks_init();  
 	leds_init();
 	buttons_init();
     tft_init(1, BLACK, WHITE, RED, YELLOW);
     uart_init(COM3, 9600);
-	  uart_rx_init(COM3,&UARTOnReceiveHandler);
+	uart_rx_init(COM3,&UARTOnReceiveHandler);
 	  
 	
 	
@@ -330,12 +341,12 @@ int main()
     {
 	    if(button_pressed(BUTTON1))
 	    {
-				led_on(LED1);
+			led_on(LED1);
 	    	break;
 	    }
     }
 
-		AutoModeThrower();
+	AutoModeThrower();
     ManualMode();
 	return 0;
 }
