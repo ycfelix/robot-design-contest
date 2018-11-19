@@ -6,19 +6,17 @@
 #include "stm32f10x_tim.h"
 #include "stdio.h"
 #include "misc.h"
+#include "main.h"
+#include "rcc.h"
+#include "ticks.h"
+#include "gpio.h"
 
-//init ultra sonic
+
 void sonar_init();
 
-int get_flag(int num);
-//idk wtf is it
-void EXTI0_IRQHandler(void);
+void EXTI2_IRQHandler(void);
 
-//send pluse
 void sonar_start();
 
-//receive singal
- int sonar_get();
+unsigned int sonar_get();
 
-//also dk wtf is it
-void TIM4_IRQHandler(void);
