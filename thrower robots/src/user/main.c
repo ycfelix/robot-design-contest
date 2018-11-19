@@ -21,8 +21,6 @@ const int MOVEMENTTIME=2000;
 
 char ReceivedAction='\0';
 
-int CanEnterManual=0;
-
 //coordinate structure
 typedef struct
 {
@@ -31,7 +29,7 @@ typedef struct
 } Coordinate;
 
 //not useful for now 
-typedef enum {FORWARD=1,BACKWARD=-1,LEFT=2,RIGHT=3}Direction;
+typedef enum {FORWARD=1,BACKWARD=0,LEFT=2,RIGHT=3}Direction;
 
 typedef enum {LEFTWHEEL,RIGHTWHEEL}Wheel;
 
@@ -92,8 +90,8 @@ void ManualMove(Direction dir)
     {
         case FORWARD: motor_control(MOTOR1,SPEED,dir); motor_control(MOTOR2,SPEED,dir);break;
         case BACKWARD: motor_control(MOTOR1,SPEED,dir); motor_control(MOTOR2,SPEED,dir);break;
-        case LEFT: motor_control(MOTOR1,LeftCurrentPower,-1*dir); motor_control(MOTOR2,RightCurrentPower,dir);break;
-        case RIGHT: motor_control(MOTOR1,LeftCurrentPower,dir); motor_control(MOTOR2,RightCurrentPower,-1*dir);break;
+        case LEFT: motor_control(MOTOR1,LeftCurrentPower,0*dir); motor_control(MOTOR2,RightCurrentPower,dir);break;
+        case RIGHT: motor_control(MOTOR1,LeftCurrentPower,dir); motor_control(MOTOR2,RightCurrentPower,0*dir);break;
         default:break;
     }
 
@@ -151,6 +149,8 @@ void MinusPower(Wheel wheel)
 void Move(Actions Compus,int dir)
 {
 	//start moving
+	if(dir<0){dir=0;}
+	
 	motor_control(MOTOR1,SPEED,dir);
 	motor_control(MOTOR2,SPEED,dir);
 	int this_ticks = get_ticks();
@@ -265,7 +265,7 @@ void ManualMode()
 
 
 
-int AutoModeThrower()
+void AutoModeThrower()
 {
 	//initialize current position=5,5 coordinate
 	CurrentPosition.x=5;
@@ -306,16 +306,14 @@ int AutoModeThrower()
 			}
 			init=2;
 		}
-        return 1;
-
+        break;
 	}
-	return 0;
 }
 
 
 void UARTOnReceiveHandler(const u8 received){
 	
-	if(ReceivedAction=='\0'&&CanEnterManual==1)
+	if(ReceivedAction=='\0')
 	{ReceivedAction=received;}
     return;
 }
@@ -350,7 +348,7 @@ int main()
 	    }
     }
 
-	CanEnterManual=AutoModeThrower();
+	//AutoModeThrower();
     ManualMode();
 	return 0;
 }
