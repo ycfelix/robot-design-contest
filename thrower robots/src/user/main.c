@@ -87,28 +87,11 @@ void Usart3_Send_Data(char *string)
 }
 
 
-extern void USART3_IRQHandler(void)
-{
-    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
-
-        switch((char)USART_ReceiveData(USART3))
-        {
-            case 'W':ManualMove(FORWARD);Usart3_Send_Data("Forward \n");break;
-            case 'A':ManualMove(LEFT);Usart3_Send_Data("Turn Left \n");break;
-            case 'S':ManualMove(BACKWARD);Usart3_Send_Data("Backward \n");break;
-            case 'D':ManualMove(RIGHT);Usart3_Send_Data("Turn Right \n");break;
-            case 'L':Usart3_Send_Data("Left add power \n");break;
-            case 'X':Usart3_Send_Data("Left sub power \n");break;
-            case 'R':Usart3_Send_Data("Right add power \n");break;
-            case 'Y':Usart3_Send_Data("Right sub power \n");break;
-        }
-    }
-}
 
 
 void ManualMove(Direction dir)
 {
-    int this_ticks =get_ticks();
+    int this_ticks =0;
     int Current=this_ticks;
 
     switch(dir)
@@ -122,15 +105,15 @@ void ManualMove(Direction dir)
 
     while(1)
     {
-        while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
+			int i=0;
+			led_on(LED1);
+       for (;i<720000;i++){;}
+			led_off(LED1);
 
-        if(this_ticks-Current>=TURNINGTIME)
-        {
             motor_control(MOTOR1,1,1);
             motor_control(MOTOR2,1,1);
             return;
-        }
+      
     }   
 }
 
@@ -305,9 +288,19 @@ void AutoModeThrower()
 
 
 void UARTOnReceiveHandler(const u8 received){
-    //whenever you type something in coolterm, 
-    //each character will triger this function 
-    //the character will be the argument for this function
+	
+     switch((char)received)
+     {
+         case 'w':led_on(LED2); uart_tx_str(COM3,"forward\n");ManualMove(FORWARD);break;
+         case 'a':led_off(LED2);ManualMove(LEFT);uart_tx_str(COM3,"left \n");break;
+         case 's':ManualMove(BACKWARD);uart_tx_str(COM3,"back \n");break;
+         case 'd':ManualMove(RIGHT);uart_tx_str(COM3,"right\n");break;
+         case 'l':AddPower(LEFTWHEEL);uart_tx_str(COM3,"add left power\n");break;
+         case 'x':MinusPower(LEFTWHEEL);uart_tx_str(COM3,"sub left power\n");break;
+         case 'r':AddPower(RIGHTWHEEL);uart_tx_str(COM3,"add right power\n");break;
+         case 'y':MinusPower(RIGHTWHEEL);uart_tx_str(COM3,"sub right power\n");break;
+				 default:uart_tx_str(COM3,"invalid action\n"); break;
+     }
     return;
 }
 
@@ -320,25 +313,29 @@ int main()
 	leds_init();
 	buttons_init();
     tft_init(1, BLACK, WHITE, RED, YELLOW);
-    uart_init(COM3, 115200);
-	uart_rx_init(COM3,UARTOnReceiveHandler);
+    uart_init(COM3, 9600);
+	  uart_rx_init(COM3,&UARTOnReceiveHandler);
+	  
+	
+	
 	//initialize motor, prescalar 10, autoreload=6000
 	motor_init(MOTOR1, 39, AUTORELOAD,1,1);
 	motor_init(MOTOR2, 39, AUTORELOAD,1,1);
-	
+	uint32_t lastticks=get_ticks();
 	//initialize linetracker
 	lineTracker_init();
-
+     
 	//enter thrower robot movement subroutine
 	while(1)
     {
 	    if(button_pressed(BUTTON1))
 	    {
+				led_on(LED1);
 	    	break;
 	    }
     }
 
-	AutoModeThrower();
+		AutoModeThrower();
     ManualMode();
 	return 0;
 }

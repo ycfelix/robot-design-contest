@@ -144,7 +144,7 @@ void uart_tx_it_init(UARTPort* uart) {
  * @brief      Start non-blocking (interrupt based) TX from the given UART Port
  *
  * @param      uart     The UART Port Handle
- * @param[in]  handler  The Transmission Handler
+ * @param[in]  handler  The Transmission Handler 
  *
  * @return     0 if UART TX was already busy, 1 otherwise
  */
@@ -191,4 +191,7 @@ static void uart_irq_handler(UARTPort* uart) {
 void USART1_IRQHandler(void) {
 	uart_irq_handler(&UARTPort1);
 }
-void USART3_IRQHandler(void);
+void USART3_IRQHandler(void)
+{
+	uart_irq_handler(&UARTPort3);
+}
