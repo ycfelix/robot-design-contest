@@ -30,17 +30,15 @@ Build target 'Default'
 compiling main.c...
 .\src\library\lineTracker.h(22): warning:  #1-D: last line of file ends without a newline
   #endif
-src\user\main.c(95): warning:  #177-D: variable "Current"  was declared but never referenced
-      int Current=this_ticks;
-src\user\main.c(201): warning:  #68-D: integer conversion resulted in a change of sign
+src\user\main.c(196): warning:  #68-D: integer conversion resulted in a change of sign
   	motor_control(MOTOR2,SPEED,-1);
-src\user\main.c(315): warning:  #188-D: enumerated type mixed with another type
+src\user\main.c(326): warning:  #188-D: enumerated type mixed with another type
       tft_init(1, BLACK, WHITE, RED, YELLOW);
-src\user\main.c: 4 warnings, 0 errors
+src\user\main.c: 3 warnings, 0 errors
 linking...
-Program Size: Code=16652 RO-data=1460 RW-data=2048 ZI-data=3728  
+Program Size: Code=16212 RO-data=1464 RW-data=2044 ZI-data=3732  
 FromELF: creating hex file...
-".\Objects\ustrobo18_internal.axf" - 0 Error(s), 4 Warning(s).
+".\Objects\ustrobo18_internal.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -67,9 +65,9 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.1.2
 
    * Component: ARM::CMSIS:DSP:1.5.2
-      Include file:  CMSIS\DSP\Include\arm_math.h
       Library file:  CMSIS\Lib\ARM\arm_cortexM3l_math.lib
-Build Time Elapsed:  00:00:00
+      Include file:  CMSIS\DSP\Include\arm_math.h
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>
