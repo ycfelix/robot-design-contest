@@ -21,6 +21,8 @@ const int MOVEMENTTIME=2000;
 
 char ReceivedAction='\0';
 
+int CanEnterManual=0;
+
 //coordinate structure
 typedef struct
 {
@@ -265,7 +267,7 @@ void ManualMode()
 
 
 
-void AutoModeThrower()
+int AutoModeThrower()
 {
 	//initialize current position=5,5 coordinate
 	CurrentPosition.x=5;
@@ -306,14 +308,15 @@ void AutoModeThrower()
 			}
 			init=2;
 		}
-        break;
+        return 1;
 	}
+	return 0;
 }
 
 
 void UARTOnReceiveHandler(const u8 received){
 	
-	if(ReceivedAction=='\0')
+	if(ReceivedAction=='\0'&&CanEnterManual==1)
 	{ReceivedAction=received;}
     return;
 }
@@ -348,7 +351,7 @@ int main()
 	    }
     }
 
-	//AutoModeThrower();
+	CanEnterManual=AutoModeThrower();
     ManualMode();
 	return 0;
 }
