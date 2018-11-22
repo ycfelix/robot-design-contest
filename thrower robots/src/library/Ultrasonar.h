@@ -6,16 +6,17 @@
 #include "stm32f10x_tim.h"
 #include "stdio.h"
 #include "misc.h"
-#include "main.h"
-#include "rcc.h"
-#include "ticks.h"
 #include "gpio.h"
 
-
+//call this to enable timer 3 and gpio stuff
 void sonar_init();
 
+
+//interrupt handler for open counter and close counter
 void EXTI2_IRQHandler(void);
 
+
+//call this and it will update the sonar value automatically
 void sonar_start();
 
 unsigned int sonar_get();

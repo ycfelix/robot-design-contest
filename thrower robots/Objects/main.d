@@ -29,3 +29,6 @@
 .\objects\main.o: .\src\library\adc.h
 .\objects\main.o: src\user\main.h
 .\objects\main.o: .\src\library\lineTracker.h
+.\objects\main.o: .\src\library\Ultrasonar.h
+.\objects\main.o: .\src\stm32f10x_std\inc\stm32f10x_tim.h
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

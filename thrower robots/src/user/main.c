@@ -12,6 +12,7 @@
 #include "adc.h"
 #include "main.h"
 #include "lineTracker.h"
+#include "Ultrasonar.h"
 
 const int AUTORELOAD=6000;
 
@@ -65,7 +66,7 @@ typedef enum
 //a set of robot action, will go from start zone to throwing zone
 Actions RobotActions[]=
 		{		
-			WEST,WEST,WEST,WEST,EAST,
+			WEST,WEST,WEST,WEST,RACKPICK,EAST,
 			CLKWISE,
 			NORTH,NORTH,NORTH,NORTH,NORTH,
 			CLKWISE,
@@ -197,7 +198,7 @@ void TurnClockWise()
 {
 	
 	motor_control(MOTOR1,SPEED,1);
-	motor_control(MOTOR2,SPEED,-1);
+	motor_control(MOTOR2,SPEED,0);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -265,7 +266,28 @@ void ManualMode()
 }
 
 
+void PickRack()
+{
+	int this_ticks =get_ticks();
+	int nowticks=this_ticks;
+	while(1)
+	{
+		while (get_ticks() == this_ticks);
+		this_ticks = get_ticks();
 
+		if(this_ticks-nowticks>=25)
+		{
+			sonar_start();
+			nowticks=this_ticks;
+		}
+
+
+
+
+	}
+
+
+}
 
 int AutoModeThrower()
 {
@@ -301,6 +323,7 @@ int AutoModeThrower()
 					case NORTH:Move(NORTH,abs(RobotActions[i]-direction)==180?dir*=-1:dir);direction=NORTH;break;
 					case SOUTH:Move(SOUTH,abs(RobotActions[i]-direction)==180?dir*=-1:dir);direction=SOUTH;break;
 					case CLKWISE:TurnClockWise();break;
+					case RACKPICK:PickRack();break;
 					default:break;
 				}
 				//delay 2s to hold the car
@@ -334,12 +357,13 @@ int main()
 	  
 	
 	
-	//initialize motor, prescalar 10, autoreload=6000
+	//initialize motor, prescalar 40, autoreload=6000
 	motor_init(MOTOR1, 39, AUTORELOAD,1,1);
 	motor_init(MOTOR2, 39, AUTORELOAD,1,1);
 	uint32_t lastticks=get_ticks();
 	//initialize linetracker
 	lineTracker_init();
+	sonar_init();
      
 	//enter thrower robot movement subroutine
 	while(1)

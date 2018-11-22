@@ -644,14 +644,14 @@
               <FilePath>.\src\library\lineTracker.c</FilePath>
             </File>
             <File>
-              <FileName>Sonar.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\library\Sonar.c</FilePath>
-            </File>
-            <File>
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\library\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ultrasonar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\library\Ultrasonar.c</FilePath>
             </File>
           </Files>
         </Group>
