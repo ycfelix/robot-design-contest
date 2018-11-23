@@ -13,6 +13,7 @@
 #include "main.h"
 #include "lineTracker.h"
 #include "Ultrasonar.h"
+#include "Piston.h"
 
 const int AUTORELOAD=6000;
 
@@ -40,11 +41,13 @@ typedef enum {LEFTWHEEL,RIGHTWHEEL}Wheel;
 
 void ManualMove(Direction);
 
-const int SPEED=6000/5;
+const int LEFTSPEED=200;
 
-int LeftCurrentPower=SPEED;
+const int RIGHTSPEED=100;
 
-int RightCurrentPower=SPEED;
+int LeftCurrentPower=LEFTSPEED;
+
+int RightCurrentPower=RIGHTSPEED;
 
 
 //direction
@@ -60,8 +63,8 @@ typedef enum
     RACKDROP,
     SHUFFLEGRAB,
     SHUFFLERELEASE,
-	SHOOT,
-	UNSHOOT
+		SHOOT,
+		UNSHOOT
 
 }Actions;
 
@@ -93,8 +96,8 @@ void ManualMove(Direction dir)
 
     switch(dir)
     {
-        case FORWARD: motor_control(MOTOR1,SPEED,dir); motor_control(MOTOR2,SPEED,dir);break;
-        case BACKWARD: motor_control(MOTOR1,SPEED,dir); motor_control(MOTOR2,SPEED,dir);break;
+        case FORWARD: motor_control(MOTOR1,LEFTSPEED,dir); motor_control(MOTOR2,RIGHTSPEED,dir);break;
+        case BACKWARD: motor_control(MOTOR1,LEFTSPEED,dir); motor_control(MOTOR2,RIGHTSPEED,dir);break;
         case LEFT: motor_control(MOTOR1,LeftCurrentPower,0*dir); motor_control(MOTOR2,RightCurrentPower,dir);break;
         case RIGHT: motor_control(MOTOR1,LeftCurrentPower,dir); motor_control(MOTOR2,RightCurrentPower,0*dir);break;
         default:break;
@@ -122,12 +125,12 @@ void AddPower(Wheel wheel)
     switch(wheel)
     {
         case LEFTWHEEL:
-        if(LeftCurrentPower+SPEED<=AUTORELOAD)
-        {LeftCurrentPower+=SPEED;}
+        if(LeftCurrentPower+LEFTSPEED<=AUTORELOAD)
+        {LeftCurrentPower+=LEFTSPEED;}
         break;
         case RIGHTWHEEL:
-        if(RightCurrentPower+SPEED<=AUTORELOAD)
-        {RightCurrentPower+=SPEED;}
+        if(RightCurrentPower+RIGHTSPEED<=AUTORELOAD)
+        {RightCurrentPower+=RIGHTSPEED;}
         break;
     }
 }
@@ -138,12 +141,12 @@ void MinusPower(Wheel wheel)
     switch(wheel)
     {
         case LEFTWHEEL:
-        if(LeftCurrentPower-SPEED>=1)
-        {LeftCurrentPower-=SPEED;}
+        if(LeftCurrentPower-LEFTSPEED>=1)
+        {LeftCurrentPower-=LEFTSPEED;}
         break;
         case RIGHTWHEEL:
-        if(RightCurrentPower-SPEED>=1)
-        {RightCurrentPower-=SPEED;}
+        if(RightCurrentPower-RIGHTSPEED>=1)
+        {RightCurrentPower-=RIGHTSPEED;}
         break;
     }
 }
@@ -152,33 +155,43 @@ void MinusPower(Wheel wheel)
 void GoStraightAjustment(){
 
      motor_control(MOTOR1,1,1);
-	 motor_control(MOTOR2,1,0);
+		servo_control(SERVO1, 1);
+		motor_control(MOTOR2,1,0);
+		servo_control(SERVO2, 1);
      delay(50);
      LT1_state=ReadLineTracker(lineTracker1);
      LT2_state=ReadLineTracker(lineTracker2);
     while(!(LT1_state&&LT2_state))
     {
-    	if(LT1_state==1&&LT2_state==0)
+				if(LT1_state==1&&LT2_state==0)
         {
             //rotate anti-clockwise
-            motor_control(MOTOR1,SPEED,1);
-	        motor_control(MOTOR2,SPEED,0);
+					servo_control(SERVO1, LEFTSPEED);
+            motor_control(MOTOR1,LEFTSPEED,1);
+					servo_control(SERVO2, RIGHTSPEED);
+						motor_control(MOTOR2,RIGHTSPEED,0);
             delay(100);
         }
         else if(LT2_state==1&&LT1_state==0)
         {
 	        //rotate clockwise
-            motor_control(MOTOR1,SPEED,1);
-	        motor_control(MOTOR2,SPEED,0);
+					servo_control(SERVO1, LEFTSPEED);
+            motor_control(MOTOR1,LEFTSPEED,1);
+					servo_control(SERVO2, RIGHTSPEED);
+	        motor_control(MOTOR2,RIGHTSPEED,0);
             delay(100);
         }
         while(ReadLineTracker(lineTracker1)+ReadLineTracker(lineTracker2)<1)
         {
-            motor_control(MOTOR1,SPEED,1);
-	        motor_control(MOTOR2,SPEED,1);
+					servo_control(SERVO1, LEFTSPEED);
+          motor_control(MOTOR1,LEFTSPEED,1);
+					servo_control(SERVO2, RIGHTSPEED);
+	        motor_control(MOTOR2,RIGHTSPEED,1);
         }
+				servo_control(SERVO1, 1);
         motor_control(MOTOR1,1,1);
-	    motor_control(MOTOR2,1,1);
+				servo_control(SERVO2, 1);
+				motor_control(MOTOR2,1,1);
         delay(50);
     }
 	
@@ -190,13 +203,22 @@ void Move(Actions Compus,int dir)
 	//start moving
 	if(dir<0){dir=0;}
 	
-	motor_control(MOTOR1,SPEED,dir);
-	motor_control(MOTOR2,SPEED,dir);
+	servo_control(SERVO1, LEFTSPEED);
+	motor_control(MOTOR1,LEFTSPEED,dir);
+	servo_control(SERVO2, RIGHTSPEED);
+	motor_control(MOTOR2,RIGHTSPEED,dir);
 	int this_ticks = get_ticks();
 
 	while (1)
 	{
-		if(button_pressed(BUTTON1)){CurrentPosition.x++;CurrentPosition.y++;break;}
+		if(button_pressed(BUTTON1))
+		{
+			servo_control(SERVO1, 1);
+			motor_control(MOTOR1,1,dir);
+			servo_control(SERVO2, 1);
+			motor_control(MOTOR2,1,dir);
+		CurrentPosition.x++;CurrentPosition.y++;break;
+		}
 		while (get_ticks() == this_ticks);
 		this_ticks = get_ticks();
 
@@ -219,8 +241,10 @@ void Move(Actions Compus,int dir)
 			if(ReadLineTracker(lineTracker2)==1&&LT2_state==0)
 			{LT2_state=1;}
 			
-			
+			GoStraightAjustment();
+			servo_control(SERVO1, 1);
 			motor_control(MOTOR1,1,dir);
+			servo_control(SERVO2, 1);
 			motor_control(MOTOR2,1,dir);
 			//update the robots coordinate
             switch(Compus)
@@ -239,22 +263,29 @@ void Move(Actions Compus,int dir)
 
 
 void PostTurnAdjustment(){
-    	int LT1_temp = 0;
+    int LT1_temp = 0;
 		int LT2_temp = 0;
-	while(!(LT1_temp&&LT2_temp)){
+		while(!(LT1_temp&&LT2_temp)){
 
 		if(LT1_temp){
-			motor_control(MOTOR1,SPEED,0);
-			motor_control(MOTOR2,SPEED,1);
+			motor_control(MOTOR1,LEFTSPEED,0);
+			servo_control(SERVO1, LEFTSPEED);
+			motor_control(MOTOR2,RIGHTSPEED,1);
+			servo_control(SERVO2, RIGHTSPEED);
 		}
 		else{			
-			motor_control(MOTOR1,SPEED,1);
-			motor_control(MOTOR2,SPEED,0);
+			servo_control(SERVO1, LEFTSPEED);
+			motor_control(MOTOR1,LEFTSPEED,1);
+			servo_control(SERVO2,RIGHTSPEED);
+			motor_control(MOTOR2,RIGHTSPEED,0);
 		}
 		delay(100);
-		motor_control(MOTOR1,SPEED,1);
-		motor_control(MOTOR2,SPEED,1);
-		while(LT1_temp+LT2_temp < 1){
+		servo_control(SERVO1, LEFTSPEED);
+		motor_control(MOTOR1,LEFTSPEED,1);
+		servo_control(SERVO2,RIGHTSPEED);
+		motor_control(MOTOR2,RIGHTSPEED,1);
+		while(LT1_temp+LT2_temp < 1)
+		{
 			LT1_temp = ReadLineTracker(lineTracker1);
 			LT2_temp = ReadLineTracker(lineTracker2);
 		}
@@ -265,8 +296,10 @@ void PostTurnAdjustment(){
 void TurnClockWise()
 {
 	
-	motor_control(MOTOR1,SPEED,1);
+	motor_control(MOTOR1,LEFTSPEED,1);
+	servo_control(SERVO1, LEFTSPEED);
 	motor_control(MOTOR2,1,0);
+	servo_control(SERVO2, 1);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -291,6 +324,8 @@ void TurnClockWise()
 			}
 	      LT1_state = 1;
 				LT2_state = 1;			
+				servo_control(SERVO1, 1);
+				servo_control(SERVO2, 1);
 				motor_control(MOTOR1,1,1);
 		    motor_control(MOTOR2,1,1);			
 				break;
@@ -374,9 +409,9 @@ void PickRack()
 		}
 
 		delay(50);
-		motor_control(MOTOR1,SPEED,1);
-		motor_control(MOTOR2,SPEED,1);
-	}
+		motor_control(MOTOR1,LEFTSPEED,1);
+		motor_control(MOTOR2,RIGHTSPEED,1);
+	} 
 }
 
 void ReleaseRack()
@@ -458,8 +493,11 @@ int main()
 	
 	
 	//initialize motor, prescalar 40, autoreload=6000
-	motor_init(MOTOR1, 39, AUTORELOAD,1,1);
-	motor_init(MOTOR2, 39, AUTORELOAD,1,1);
+	motor_init(MOTOR1, 39, AUTORELOAD,3000,1);
+	motor_init(MOTOR2, 39, AUTORELOAD,3000,1);
+	servo_init(SERVO1,39,6000,3000);
+	servo_init(SERVO2,39,6000,3000);
+	
 	uint32_t lastticks=get_ticks();
 	//initialize linetracker
 	lineTracker_init();
@@ -474,6 +512,7 @@ int main()
 	    break;
 	    }
     }
+		delay(500);
 
 		CanEnterManual=AutoModeThrower();
     ManualMode();
