@@ -107,7 +107,7 @@ void ManualMove(Direction dir)
 
 		if(this_ticks-Current>=MOVEMENTTIME)
 		{
- 			motor_control(MOTOR1,1,1);
+					motor_control(MOTOR1,1,1);
        	 	motor_control(MOTOR2,1,1);
          	return;
 		}
@@ -149,6 +149,40 @@ void MinusPower(Wheel wheel)
 }
 
 
+void GoStraightAjustment(){
+
+     motor_control(MOTOR1,1,1);
+	 motor_control(MOTOR2,1,0);
+     delay(50);
+     LT1_state=ReadLineTracker(lineTracker1);
+     LT2_state=ReadLineTracker(lineTracker2);
+    while(!(LT1_state&&LT2_state))
+    {
+    	if(LT1_state==1&&LT2_state==0)
+        {
+            //rotate anti-clockwise
+            motor_control(MOTOR1,SPEED,1);
+	        motor_control(MOTOR2,SPEED,0);
+            delay(100);
+        }
+        else if(LT2_state==1&&LT1_state==0)
+        {
+	        //rotate clockwise
+            motor_control(MOTOR1,SPEED,1);
+	        motor_control(MOTOR2,SPEED,0);
+            delay(100);
+        }
+        while(ReadLineTracker(lineTracker1)+ReadLineTracker(lineTracker2)<1)
+        {
+            motor_control(MOTOR1,SPEED,1);
+	        motor_control(MOTOR2,SPEED,1);
+        }
+        motor_control(MOTOR1,1,1);
+	    motor_control(MOTOR2,1,1);
+        delay(50);
+    }
+	
+}
 
 // Move east until it sees a white line and then stop
 void Move(Actions Compus,int dir)
@@ -162,6 +196,7 @@ void Move(Actions Compus,int dir)
 
 	while (1)
 	{
+		if(button_pressed(BUTTON1)){CurrentPosition.x++;CurrentPosition.y++;break;}
 		while (get_ticks() == this_ticks);
 		this_ticks = get_ticks();
 
@@ -170,18 +205,27 @@ void Move(Actions Compus,int dir)
 		{
 			LT1_state=0;
 		}
-
+		
+		if(LT2_state==1&&ReadLineTracker(lineTracker2)==0)
+		{
+			LT2_state=0;
+		}
 
 		//Stop when It read white lines
-		if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
+		if((ReadLineTracker(lineTracker1)==1&&LT1_state==0)||(ReadLineTracker(lineTracker2)==1&&LT2_state==0))
 		{
-			LT1_state=1;
+			if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
+			{LT1_state=1;}
+			if(ReadLineTracker(lineTracker2)==1&&LT2_state==0)
+			{LT2_state=1;}
+			
+			
 			motor_control(MOTOR1,1,dir);
 			motor_control(MOTOR2,1,dir);
 			//update the robots coordinate
             switch(Compus)
             {
-                case EAST:CurrentPosition.x++;break;
+        case EAST:CurrentPosition.x++;break;
 				case WEST:CurrentPosition.x--;break;
 				case NORTH:CurrentPosition.y--;break;
 				case SOUTH:CurrentPosition.y++;break;
@@ -245,11 +289,11 @@ void TurnClockWise()
       {
 				PostTurnAdjustment();
 			}
-	        LT1_state = 1;
-			LT2_state = 1;			
-			motor_control(MOTOR1,1,1);
+	      LT1_state = 1;
+				LT2_state = 1;			
+				motor_control(MOTOR1,1,1);
 		    motor_control(MOTOR2,1,1);			
-					
+				break;
 		}
 	
 	}
@@ -272,7 +316,6 @@ void GrabSpecialShuttlecock()
 
 void ManualMode()
 {	
-	
 	int this_ticks =get_ticks();
     while(1)
     {
@@ -370,6 +413,7 @@ int AutoModeThrower()
 		{
 			for(int i=0;i<Actions_Length;i++)
 			{
+				
 				switch(RobotActions[i])
 				{
 					case EAST:Move(EAST,abs(RobotActions[i]-direction)==180?dir*=-1:dir);direction=EAST;break;
@@ -381,6 +425,7 @@ int AutoModeThrower()
 					case RACKDROP:ReleaseRack();break;
 					default:break;
 				}
+				uart_tx_str(COM3,"action=%d coordinate x= %d y= %d \n",RobotActions[i],CurrentPosition.x,CurrentPosition.y);
 				//delay 2s to hold the car
 				delay(3000);			
 			}
@@ -408,7 +453,7 @@ int main()
 	buttons_init();
     //tft_init(1, BLACK, WHITE, RED, YELLOW);
     uart_init(COM3, 115200);
-		uart_rx_init(COM3,&UARTOnReceiveHandler);
+	uart_rx_init(COM3,&UARTOnReceiveHandler);
 	  
 	
 	
@@ -425,12 +470,12 @@ int main()
     {
 	    if(button_pressed(BUTTON1))
 	    {
-			led_on(LED1);
+		led_on(LED1);
 	    break;
 	    }
     }
 
-	//CanEnterManual=AutoModeThrower();
+		CanEnterManual=AutoModeThrower();
     ManualMode();
 	return 0;
 }
