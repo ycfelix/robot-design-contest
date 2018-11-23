@@ -194,13 +194,35 @@ void Move(Actions Compus,int dir)
 }
 
 
+void PostTurnAdjustment(){
+    	int LT1_temp = 0;
+		int LT2_temp = 0;
+	while(!(LT1_temp&&LT2_temp)){
 
+		if(LT1_temp){
+			motor_control(MOTOR1,SPEED,0);
+			motor_control(MOTOR2,SPEED,1);
+		}
+		else{			
+			motor_control(MOTOR1,SPEED,1);
+			motor_control(MOTOR2,SPEED,0);
+		}
+		delay(100);
+		motor_control(MOTOR1,SPEED,1);
+		motor_control(MOTOR2,SPEED,1);
+		while(LT1_temp+LT2_temp < 1){
+			LT1_temp = ReadLineTracker(lineTracker1);
+			LT2_temp = ReadLineTracker(lineTracker2);
+		}
+	}
+}
 
+//prerequisite: both sensors detect line
 void TurnClockWise()
 {
 	
 	motor_control(MOTOR1,SPEED,1);
-	motor_control(MOTOR2,SPEED,0);
+	motor_control(MOTOR2,1,0);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -212,14 +234,24 @@ void TurnClockWise()
 		{
 			LT1_state=0;
 		}
-		//Stop when It read white lines
-		if(ReadLineTracker(lineTracker1)==1&&LT1_state==0)
+		if(LT2_state==1&&ReadLineTracker(lineTracker2)==0)
 		{
-	    	LT1_state=1;
-			motor_control(MOTOR1,1,1);
-		    motor_control(MOTOR2,1,1);
-			return;					
+			LT2_state=0;
 		}
+		//When LT2=1 , then adjust
+		if(ReadLineTracker(lineTracker2)==1&&LT2_state==0)
+		{
+			while(!(ReadLineTracker(lineTracker1)&&ReadLineTracker(lineTracker2)))
+      {
+				PostTurnAdjustment();
+			}
+	        LT1_state = 1;
+			LT2_state = 1;			
+			motor_control(MOTOR1,1,1);
+		    motor_control(MOTOR2,1,1);			
+					
+		}
+	
 	}
 }
 
@@ -362,7 +394,7 @@ int AutoModeThrower()
 
 void UARTOnReceiveHandler(const u8 received){
 	
-	if(ReceivedAction=='\0'&&CanEnterManual==1)
+	if(ReceivedAction=='\0')
 	{ReceivedAction=received;}
     return;
 }
@@ -374,9 +406,9 @@ int main()
     ticks_init();  
 	leds_init();
 	buttons_init();
-    tft_init(1, BLACK, WHITE, RED, YELLOW);
-    uart_init(COM3, 9600);
-	uart_rx_init(COM3,&UARTOnReceiveHandler);
+    //tft_init(1, BLACK, WHITE, RED, YELLOW);
+    uart_init(COM3, 115200);
+		uart_rx_init(COM3,&UARTOnReceiveHandler);
 	  
 	
 	
@@ -386,7 +418,7 @@ int main()
 	uint32_t lastticks=get_ticks();
 	//initialize linetracker
 	lineTracker_init();
-	sonar_init();
+	//sonar_init();
      
 	//enter thrower robot movement subroutine
 	while(1)
@@ -394,11 +426,11 @@ int main()
 	    if(button_pressed(BUTTON1))
 	    {
 			led_on(LED1);
-	    	break;
+	    break;
 	    }
     }
 
-	CanEnterManual=AutoModeThrower();
+	//CanEnterManual=AutoModeThrower();
     ManualMode();
 	return 0;
 }
