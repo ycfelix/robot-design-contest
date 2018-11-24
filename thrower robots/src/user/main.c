@@ -157,7 +157,7 @@ void GoStraightAjustment(){
      motor_control(MOTOR1,1,1);
 		servo_control(SERVO1, 1);
 		motor_control(MOTOR2,1,0);
-		servo_control(SERVO2, 1);
+		servo_control(SERVO3, 1);
      delay(50);
      LT1_state=ReadLineTracker(lineTracker1);
      LT2_state=ReadLineTracker(lineTracker2);
@@ -168,7 +168,7 @@ void GoStraightAjustment(){
             //rotate anti-clockwise
 					servo_control(SERVO1, LEFTSPEED);
             motor_control(MOTOR1,LEFTSPEED,1);
-					servo_control(SERVO2, RIGHTSPEED);
+					servo_control(SERVO3, RIGHTSPEED);
 						motor_control(MOTOR2,RIGHTSPEED,0);
             delay(100);
         }
@@ -177,7 +177,7 @@ void GoStraightAjustment(){
 	        //rotate clockwise
 					servo_control(SERVO1, LEFTSPEED);
             motor_control(MOTOR1,LEFTSPEED,1);
-					servo_control(SERVO2, RIGHTSPEED);
+					servo_control(SERVO3, RIGHTSPEED);
 	        motor_control(MOTOR2,RIGHTSPEED,0);
             delay(100);
         }
@@ -185,12 +185,12 @@ void GoStraightAjustment(){
         {
 					servo_control(SERVO1, LEFTSPEED);
           motor_control(MOTOR1,LEFTSPEED,1);
-					servo_control(SERVO2, RIGHTSPEED);
+					servo_control(SERVO3, RIGHTSPEED);
 	        motor_control(MOTOR2,RIGHTSPEED,1);
         }
 				servo_control(SERVO1, 1);
         motor_control(MOTOR1,1,1);
-				servo_control(SERVO2, 1);
+				servo_control(SERVO3, 1);
 				motor_control(MOTOR2,1,1);
         delay(50);
     }
@@ -205,7 +205,7 @@ void Move(Actions Compus,int dir)
 	
 	servo_control(SERVO1, LEFTSPEED);
 	motor_control(MOTOR1,LEFTSPEED,dir);
-	servo_control(SERVO2, RIGHTSPEED);
+	servo_control(SERVO3, RIGHTSPEED);
 	motor_control(MOTOR2,RIGHTSPEED,dir);
 	int this_ticks = get_ticks();
 
@@ -215,7 +215,7 @@ void Move(Actions Compus,int dir)
 		{
 			servo_control(SERVO1, 1);
 			motor_control(MOTOR1,1,dir);
-			servo_control(SERVO2, 1);
+			servo_control(SERVO3, 1);
 			motor_control(MOTOR2,1,dir);
 		CurrentPosition.x++;CurrentPosition.y++;break;
 		}
@@ -244,7 +244,7 @@ void Move(Actions Compus,int dir)
 			GoStraightAjustment();
 			servo_control(SERVO1, 1);
 			motor_control(MOTOR1,1,dir);
-			servo_control(SERVO2, 1);
+			servo_control(SERVO3, 1);
 			motor_control(MOTOR2,1,dir);
 			//update the robots coordinate
             switch(Compus)
@@ -271,18 +271,18 @@ void PostTurnAdjustment(){
 			motor_control(MOTOR1,LEFTSPEED,0);
 			servo_control(SERVO1, LEFTSPEED);
 			motor_control(MOTOR2,RIGHTSPEED,1);
-			servo_control(SERVO2, RIGHTSPEED);
+			servo_control(SERVO3, RIGHTSPEED);
 		}
 		else{			
 			servo_control(SERVO1, LEFTSPEED);
 			motor_control(MOTOR1,LEFTSPEED,1);
-			servo_control(SERVO2,RIGHTSPEED);
+			servo_control(SERVO3,RIGHTSPEED);
 			motor_control(MOTOR2,RIGHTSPEED,0);
 		}
 		delay(100);
 		servo_control(SERVO1, LEFTSPEED);
 		motor_control(MOTOR1,LEFTSPEED,1);
-		servo_control(SERVO2,RIGHTSPEED);
+		servo_control(SERVO3,RIGHTSPEED);
 		motor_control(MOTOR2,RIGHTSPEED,1);
 		while(LT1_temp+LT2_temp < 1)
 		{
@@ -299,7 +299,7 @@ void TurnClockWise()
 	motor_control(MOTOR1,LEFTSPEED,1);
 	servo_control(SERVO1, LEFTSPEED);
 	motor_control(MOTOR2,1,0);
-	servo_control(SERVO2, 1);
+	servo_control(SERVO3, 1);
 	int this_ticks = get_ticks();
 
 	while (1)
@@ -325,7 +325,7 @@ void TurnClockWise()
 	      LT1_state = 1;
 				LT2_state = 1;			
 				servo_control(SERVO1, 1);
-				servo_control(SERVO2, 1);
+				servo_control(SERVO3, 1);
 				motor_control(MOTOR1,1,1);
 		    motor_control(MOTOR2,1,1);			
 				break;
@@ -493,10 +493,9 @@ int main()
 	
 	
 	//initialize motor, prescalar 40, autoreload=6000
-	motor_init(MOTOR1, 39, AUTORELOAD,3000,1);
-	motor_init(MOTOR2, 39, AUTORELOAD,3000,1);
-	servo_init(SERVO1,39,6000,3000);
-	servo_init(SERVO2,39,6000,3000);
+	motor_init(MOTOR1, 39, AUTORELOAD,1,1);
+	motor_init(MOTOR2, 39, AUTORELOAD,1,1);
+	
 	
 	uint32_t lastticks=get_ticks();
 	//initialize linetracker
@@ -514,7 +513,7 @@ int main()
     }
 		delay(500);
 
-		CanEnterManual=AutoModeThrower();
+		//CanEnterManual=AutoModeThrower();
     ManualMode();
 	return 0;
 }
