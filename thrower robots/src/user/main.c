@@ -102,22 +102,26 @@ void ManualMove(Direction dir)
         case RIGHT: motor_control(MOTOR1,LeftCurrentPower,dir); motor_control(MOTOR2,RightCurrentPower,0*dir);break;
         default:break;
     }
+		
+		
+		delay(1000);
+		motor_control(MOTOR1,0,dir); motor_control(MOTOR2,0,dir);
+		
+//    while(1)
+//    {
+//		while (get_ticks() == this_ticks);
+//		this_ticks = get_ticks();
 
-    while(1)
-    {
-		while (get_ticks() == this_ticks);
-		this_ticks = get_ticks();
+//		if(this_ticks-Current>=MOVEMENTTIME)
+//		{
+//					motor_control(MOTOR1,1,1);
+//       	 	motor_control(MOTOR2,1,1);
+//         	return;
+//		}
 
-		if(this_ticks-Current>=MOVEMENTTIME)
-		{
-					motor_control(MOTOR1,1,1);
-       	 	motor_control(MOTOR2,1,1);
-         	return;
-		}
-
-       
-      
-    }   
+//       
+//      
+//    }   
 }
 
 void AddPower(Wheel wheel)
@@ -344,14 +348,16 @@ int abs(int num)
 
 void GrabSpecialShuttlecock()
 {
-	//TODO 
+	Push_Piston(Grabber);
 }
 
 
 
 void ManualMode()
 {	
-	int this_ticks =get_ticks();
+	
+		int dir=0;
+		int this_ticks =get_ticks();
     while(1)
     {
  		while (get_ticks() == this_ticks);
@@ -359,26 +365,22 @@ void ManualMode()
 
     	switch((char)ReceivedAction)
      {
-         case 'w':led_on(LED2);ManualMove(FORWARD);ReceivedAction='\0';
-		 uart_tx_str(COM3,"forward coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);break;
-         case 'a':led_off(LED2);ManualMove(LEFT);uart_tx_str(COM3," left coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);
-		 ReceivedAction='\0';break;
-         case 's':ManualMove(BACKWARD);uart_tx_str(COM3,"back coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);
-		 ReceivedAction='\0';break;
-         case 'd':ManualMove(RIGHT);uart_tx_str(COM3,"right coordinate x= %d y= %d \n",CurrentPosition.x,CurrentPosition.y);
-		 ReceivedAction='\0';break;
-         case 'l':AddPower(LEFTWHEEL);uart_tx_str(COM3,"add left power= %d\n",LeftCurrentPower);ReceivedAction='\0';break;
-         case 'x':MinusPower(LEFTWHEEL);uart_tx_str(COM3,"sub left power= %d\n",LeftCurrentPower);ReceivedAction='\0';break;
-         case 'r':AddPower(RIGHTWHEEL);uart_tx_str(COM3,"add right power = %d\n",RightCurrentPower);ReceivedAction='\0';break;
-         case 'y':MinusPower(RIGHTWHEEL);uart_tx_str(COM3,"sub right power = %d\n",RightCurrentPower);ReceivedAction='\0';break;
-		 case 'p':GrabSpecialShuttlecock();break;
-		 default: 
+         case 'w':led_on(LED2);gpio_reset(&PA8);ReceivedAction='\0';
+		 uart_tx_str(COM3,"move forward");break;
+         case 's':gpio_set(&PA8);ReceivedAction='\0';
+		 uart_tx_str(COM3,"backward");break;
+				 case 'a':gpio_set(&PC6);ReceivedAction='\0';
+		 uart_tx_str(COM3,"left");break;
+				 case 'd':gpio_reset(&PC6);ReceivedAction='\0';
+		 uart_tx_str(COM3,"right");break;
+				 default: 
 		 
 		 if(ReceivedAction!='\0')
 		 {
 			 uart_tx_str(COM3,"invalid action\n");
 			 ReceivedAction='\0';
 		 }
+		// gpio_reset(&PC6);gpio_reset(&PC7);
 		 break;
      }  
     }
@@ -404,7 +406,7 @@ void PickRack()
 
 		if(sonar_get()<=PICKRACKDISTANCE)
 		{
-			//pick the rack
+			Push_Piston(Grabber);
 			break;
 		}
 
@@ -416,7 +418,7 @@ void PickRack()
 
 void ReleaseRack()
 {
-	//TODO release RACK
+	Pull_Piston(Grabber);
 }
 
 
@@ -448,7 +450,6 @@ int AutoModeThrower()
 		{
 			for(int i=0;i<Actions_Length;i++)
 			{
-				
 				switch(RobotActions[i])
 				{
 					case EAST:Move(EAST,abs(RobotActions[i]-direction)==180?dir*=-1:dir);direction=EAST;break;
@@ -493,9 +494,15 @@ int main()
 	
 	
 	//initialize motor, prescalar 40, autoreload=6000
-	motor_init(MOTOR1, 39, AUTORELOAD,1,1);
-	motor_init(MOTOR2, 39, AUTORELOAD,1,1);
+	//motor_init(MOTOR1, 39, AUTORELOAD,1,1);
+	//motor_init(MOTOR2, 39, AUTORELOAD,1,1);
+	//motor2
+	gpio_init(&PC7,GPIO_Mode_Out_PP);
+	gpio_init(&PA8,GPIO_Mode_Out_PP);
 	
+	//motor1
+	gpio_init(&PC6,GPIO_Mode_Out_PP);
+	gpio_init(&PC3,GPIO_Mode_Out_PP);
 	
 	uint32_t lastticks=get_ticks();
 	//initialize linetracker
