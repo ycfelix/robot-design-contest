@@ -363,16 +363,46 @@ void ManualMode()
  		while (get_ticks() == this_ticks);
 		this_ticks = get_ticks();
 
+			
+			//pc6=pwm1
+			//pc7=pwm2
+			//pa8=dir2
+			//pc3=dir1
     	switch((char)ReceivedAction)
      {
-         case 'w':led_on(LED2);gpio_reset(&PA8);ReceivedAction='\0';
+	case 'm': gpio_init(&PC7,GPIO_Mode_Out_PP);
+	gpio_init(&PA8,GPIO_Mode_Out_PP);
+	
+	//motor1
+	gpio_init(&PC6,GPIO_Mode_Out_PP);
+	gpio_init(&PC3,GPIO_Mode_Out_PP);
+			 gpio_reset(&PC6);gpio_reset(&PC7);
+			 gpio_set(&PA8);gpio_set(&PC3);
+			 ReceivedAction='\0';uart_tx_str(COM3,"inited");break;
+			 case 'w':gpio_reset(&PC6);gpio_reset(&PC7);led_on(LED2);gpio_set(&PA8);gpio_set(&PC3);ReceivedAction='\0';
 		 uart_tx_str(COM3,"move forward");break;
-         case 's':gpio_set(&PA8);ReceivedAction='\0';
+       case 's':gpio_reset(&PC6);gpio_reset(&PC7);gpio_reset(&PA8);gpio_reset(&PC3);ReceivedAction='\0';
 		 uart_tx_str(COM3,"backward");break;
-				 case 'a':gpio_set(&PC6);ReceivedAction='\0';
+				case 'a':gpio_reset(&PC6);gpio_reset(&PC7);gpio_set(&PA8);gpio_reset(&PC3);ReceivedAction='\0';
 		 uart_tx_str(COM3,"left");break;
-				 case 'd':gpio_reset(&PC6);ReceivedAction='\0';
+				 case 'd':gpio_reset(&PC6);gpio_reset(&PC7);gpio_reset(&PA8);gpio_set(&PC3);ReceivedAction='\0';
 		 uart_tx_str(COM3,"right");break;
+			 
+				 case 't':gpio_set(&PC6);gpio_set(&PC7);ReceivedAction='\0';
+		 uart_tx_str(COM3,"stop");break;
+			 
+				 case 'x':Push_Piston(Thrower);ReceivedAction='\0';
+		 uart_tx_str(COM3,"throw");break;
+			 
+				 case 'y':Pull_Piston(Thrower);ReceivedAction='\0';
+		 uart_tx_str(COM3,"pull back");break;
+		 
+				 case 'o':Push_Piston(Grabber);ReceivedAction='\0';
+		 uart_tx_str(COM3,"grabber push");break;
+		 
+		  case 'p':Pull_Piston(Grabber);ReceivedAction='\0';
+		 uart_tx_str(COM3,"grabber pull");break;
+			 
 				 default: 
 		 
 		 if(ReceivedAction!='\0')
@@ -380,10 +410,11 @@ void ManualMode()
 			 uart_tx_str(COM3,"invalid action\n");
 			 ReceivedAction='\0';
 		 }
-		// gpio_reset(&PC6);gpio_reset(&PC7);
 		 break;
-     }  
-    }
+     }
+
+		delay(100);gpio_set(&PC6);gpio_set(&PC7);		 
+    } 
 }
 
 
@@ -497,17 +528,25 @@ int main()
 	//motor_init(MOTOR1, 39, AUTORELOAD,1,1);
 	//motor_init(MOTOR2, 39, AUTORELOAD,1,1);
 	//motor2
-	gpio_init(&PC7,GPIO_Mode_Out_PP);
-	gpio_init(&PA8,GPIO_Mode_Out_PP);
+
 	
-	//motor1
-	gpio_init(&PC6,GPIO_Mode_Out_PP);
-	gpio_init(&PC3,GPIO_Mode_Out_PP);
+	
+	
+			//pc6=pwm1
+			//pc7=pwm2
+			//pa8=dir2
+			//pc3=dir1
+	//gpio_set(&PA8);
+	//gpio_set(&PC3);
+	////gpio_reset(&PC6);
+	//gpio_reset(&PC7);
+	
 	
 	uint32_t lastticks=get_ticks();
 	//initialize linetracker
 	lineTracker_init();
 	//sonar_init();
+	Piston_init();
      
 	//enter thrower robot movement subroutine
 	while(1)

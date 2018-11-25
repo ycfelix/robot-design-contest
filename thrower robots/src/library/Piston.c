@@ -10,8 +10,8 @@ const GPIOPin* Pistons[]={Piston1,Piston2};
  
 void Piston_init(void)
 {
-	gpio_init(Piston1, GPIO_Mode_IPD);
-	gpio_init(Piston2, GPIO_Mode_IPD);
+	gpio_init(Piston1, GPIO_Mode_Out_PP);
+	gpio_init(Piston2, GPIO_Mode_Out_PP);
 }
 
 //Set output
