@@ -6,23 +6,18 @@
 #include "stm32f10x_tim.h"
 #include "stdio.h"
 #include "misc.h"
+#include "gpio.h"
 
-volatile uint8_t FLAG_ECHO = 0;
-volatile uint16_t SonarValue;
-
-void SetSysClockTo72(void);
-
-//init ultra sonic
+//call this to enable timer 3 and gpio stuff
 void sonar_init();
 
-//idk wtf is it
-void EXTI0_IRQHandler(void);
 
-//send pluse
+//interrupt handler for open counter and close counter
+void EXTI2_IRQHandler(void);
+
+
+//call this and it will update the sonar value automatically
 void sonar_start();
 
-//receive singal
 unsigned int sonar_get();
 
-//also dk wtf is it
-void TIM4_IRQHandler(void);

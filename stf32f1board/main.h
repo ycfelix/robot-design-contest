@@ -1,5 +1,6 @@
 
 #include<iostream>
+#include <string>
 #ifndef MAIN_H_
 #define MAIN_H_
 using namespace std;
@@ -7,11 +8,92 @@ enum LED{Led1=1,Led2=2};
 enum Button{Button1=1,Button2=2,Button3=3};
 enum Servo{SERVO1=1,SERVO2=2,SERVO3=3};
 enum Motor{MOTOR1=1,MOTOR2=2};
+enum LineTracker{LineTracker1=0, LineTracker2=1};
+const int LENGTH=6;
+const int WIDTH=7;
+
+
+
+struct Coordinate
+{
+	int x;
+	int y;
+};
+
+class Map
+{
+	public:
+	Map()
+	{
+		InitMap(this->GameMap);
+	}
+	static void InitMap(string GameMap[][LENGTH])
+	{
+		for(int i=0;i<WIDTH;i++)
+		{
+			for(int j=0;j<LENGTH;j++)
+			{
+				if(i>=1&&i<=4)
+				{
+					if(j<=1)
+					{
+						GameMap[i][j]="No Contact Zone";
+					}
+				}
+
+				if(i==0&&j==1)
+				{
+					GameMap[i][j]="LoadingZone2";
+				}
+				if(i==0&&j==5)
+				{
+					GameMap[i][j]="LoadingZone1";
+				}
+				if(i==5&&j==5)
+				{
+					GameMap[i][j]="StartZone1";
+				}
+
+				if(j==5&&(i==0||i==1))
+				{
+					GameMap[i][j]="ThrowingZone";
+				}
+			}
+		}
+	}
+
+	private:
+	string GameMap[WIDTH][LENGTH]={""};
+
+};
+
+
+class ThrowerRobot
+{
+	public:
+
+	private:
+		Coordinate RobotPosition;
+
+};
+
+
+
+
+
+LineTracker lineTrackers[2]={LineTracker1,LineTracker2};
 clock_t (*get_ticks)()=clock;
 
 void leds_init(void){}
 void buzzer_init(void){}
 void buttons_init(void){}
+void lineTracker_init(void){}
+
+void ReadLineTracker(LineTracker lineTracker)
+{
+	return lineTrackers[lineTracker];
+}
+
 void servo_init(Servo servo, int  prescaler, int autoreload, int initial)
 {
 	cout<<" SERVO "<<servo<<" is on! "<<" time= "<< get_ticks()<<endl;

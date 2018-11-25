@@ -16,7 +16,8 @@ void lineTracker_init(void)
 
 
 //return 1 if read white lines, return 0 if read background
+//update: 1 if black, 0 if white
 u8 ReadLineTracker(lineTracker linetracker)
 {
-	return gpio_read(LineTrackers[linetracker]);
+	return !gpio_read(LineTrackers[linetracker]);
 }
