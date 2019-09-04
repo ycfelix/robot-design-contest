@@ -23,7 +23,6 @@ void ViewControl()
 {
     while(true)
     {
-        ui->lcdNumber_7->display(get_ticks());
         HandleEvent(LEDs[0],ui->lcdNumber);
         HandleEvent(LEDs[1],ui->lcdNumber_2);
         HandleEvent(LEDs[2],ui->lcdNumber_3);
