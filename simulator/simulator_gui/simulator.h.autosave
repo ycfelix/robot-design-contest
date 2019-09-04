@@ -1,0 +1,62 @@
+#pragma once
+#ifndef SIMULATOR_H_
+#define SIMULATOR_H_
+#include<iostream>
+#include <string>
+#include <time.h>
+#include <windows.h>
+#include <vector>
+using namespace std;
+enum LED { LED1 = 1, LED2 = 2,LED3=3 };
+enum Button { BUTTON1 = 1, BUTTON2 = 2, BUTTON3 = 3 };
+enum Servo { SERVO1 = 1, SERVO2 = 2, SERVO3 = 3 };
+enum Motor { MOTOR1 = 1, MOTOR2 = 2 };
+bool buttons[]={false,false,false};
+bool LEDs[]={false,false,false};
+bool Buzzer=false;
+static clock_t(*get_ticks)() = clock;
+
+void servo_control(Servo servo, int position)
+{
+
+}
+void motor_control(Motor motor, int magnitude, int direction)
+{
+
+}
+
+
+void led_on(LED led)
+{
+    LEDs[static_cast<int>(led)-1]=true;
+}
+void led_off(LED led)
+{
+    LEDs[static_cast<int>(led)-1]=false;
+}
+
+
+
+void buzzer_on()
+{
+    Buzzer=true;
+}
+
+void buzzer_off()
+{
+    Buzzer=false;
+}
+
+
+bool button_pressed(Button button)
+{
+    switch(button)
+    {
+        case BUTTON1:
+        case BUTTON2:
+        case BUTTON3:buttons[static_cast<int>(button)-1]=true;return true;
+        default:break;
+    }
+}
+
+#endif
