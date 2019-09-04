@@ -3,26 +3,34 @@
 #include "simulator.h"
 #include <QMainWindow>
 #include "ui_mainwindow.h"
-using namespace simple_mode;
 
 Ui::MainWindow* ui=nullptr;
 
-void robotics_work(){
-
-    int ticks = get_ticks();
-    while(true){
-        if (get_ticks() == ticks) { continue; }
-        if (button_pressed(BUTTON1))
-        {
-            ui->lcdNumber_4->display(1);
-            ui->lcdNumber->display(1);
-        }
-        else
-        {
-            ui->lcdNumber_4->display(0);
-            ui->lcdNumber->display(0);
-        }
+void HandleEvent(bool state,QLCDNumber* lcd)
+{
+    if(state)
+    {
+        lcd->display(1111);
+    }
+    else
+    {
+        lcd->display(0);
     }
 }
+
+
+void ViewControl()
+{
+    while(true)
+    {
+        HandleEvent(LEDs[0],ui->lcdNumber);
+        HandleEvent(LEDs[1],ui->lcdNumber_2);
+        HandleEvent(LEDs[2],ui->lcdNumber_3);
+        HandleEvent(Buttons[0],ui->lcdNumber_4);
+        HandleEvent(Buttons[1],ui->lcdNumber_5);
+        HandleEvent(Buttons[2],ui->lcdNumber_6);
+    }
+}
+
 
 #endif // CONTROLLER_H

@@ -32,6 +32,7 @@ SOURCES += \
 HEADERS += \
         controller.h \
         mainwindow.h \
+        roboticswork.h \
         simulator.h
 
 FORMS += \
